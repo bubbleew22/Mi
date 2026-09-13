@@ -77,7 +77,8 @@
   <input type="number" id="urv" placeholder="100">
   <button onclick="calcMA()">Calculate PV</button>
   <div class="result" id="maResult">—</div>
- <!-- STOPWATCH -->
+</div>
+  <!-- STOPWATCH -->
 <div class="card show" data-cat="utilities" data-name="stopwatch timer">
   <h2>⏱️ Stopwatch</h2>
   <div class="result" id="swDisplay" style="font-size:30px; font-family:monospace;">00:00:00</div>
@@ -206,7 +207,6 @@ function playBeep() {
     osc.frequency.value = 880;
     osc.start(); setTimeout(() => { osc.stop(); ctx.close(); }, 200);
   } catch(e) {}
-}
 </script>
 
 </body>
