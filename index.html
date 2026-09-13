@@ -1,1 +1,1865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a0e1a">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Snow_owl — Engineering Calculator</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { font-family: -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; background: #0a0e1a; color: #e2e8f0; padding: 12px; padding-bottom: 80px; }
+  header { text-align: center; padding: 18px 0; border-bottom: 2px solid #1e293b; margin-bottom: 16px; position: sticky; top: 0; background: #0a0e1a; z-index: 100; }
+  header h1 { color: #38bdf8; font-size: 28px; letter-spacing: 2px; }
+  header h1 span { color: #94a3b8; font-size: 20px; }
+  header p { color: #64748b; font-size: 11px; margin-top: 4px; letter-spacing: 1px; }
+  .search { width: 100%; padding: 12px 16px; border-radius: 10px; border: 1px solid #1e293b; background: #111827; color: #e2e8f0; font-size: 15px; margin-bottom: 14px; outline: none; }
+  .search:focus { border-color: #38bdf8; }
+  .tabs { display: flex; overflow-x: auto; gap: 8px; margin-bottom: 16px; padding-bottom: 8px; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab { padding: 8px 16px; background: #111827; border-radius: 20px; font-size: 13px; white-space: nowrap; cursor: pointer; border: 1px solid #1e293b; color: #94a3b8; transition: all 0.2s; }
+  .tab.active { background: #38bdf8; color: #0a0e1a; border-color: #38bdf8; font-weight: bold; }
+  .card { background: #111827; border-radius: 12px; padding: 16px; margin-bottom: 14px; border-left: 4px solid #38bdf8; display: none; }
+  .card.show { display: block; }
+  .card h2 { color: #38bdf8; font-size: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .card h2::before { content: ''; width: 8px; height: 8px; background: #38bdf8; border-radius: 50%; }
+  label { display: block; margin: 10px 0 4px; font-size: 13px; color: #94a3b8; }
+  input, select { width: 100%; padding: 11px 14px; border-radius: 8px; border: 1px solid #1e293b; background: #0a0e1a; color: #e2e8f0; font-size: 16px; outline: none; }
+  input:focus, select:focus { border-color: #38bdf8; }
+  button { width: 100%; padding: 13px; margin-top: 14px; background: #38bdf8; color: #0a0e1a; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; transition: all 0.15s; }
+  button:active { background: #0ea5e9; transform: scale(0.98); }
+  .result { margin-top: 12px; padding: 14px; background: #0a0e1a; border-radius: 8px; color: #4ade80; font-size: 19px; font-weight: bold; text-align: center; border: 1px dashed #1e293b; min-height: 20px; word-break: break-word; }
+  .result.small { font-size: 14px; text-align: left; line-height: 1.6; }
+  .colors { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 10px 0; }
+  .colors select { padding: 8px; font-size: 14px; }
+  .footer { text-align: center; color: #475569; font-size: 11px; margin-top: 30px; padding: 20px 0; line-height: 1.8; }
+  .sim-box { background: #0a0e1a; border-radius: 8px; padding: 16px; margin-top: 12px; text-align: center; }
+  .cylinder { position: relative; height: 60px; background: #1e293b; border-radius: 8px; margin: 12px 0; overflow: hidden; }
+  .piston { position: absolute; top: 5px; left: 5px; height: 50px; width: 30px; background: #38bdf8; border-radius: 4px; transition: left 0.8s ease; }
+  .rod { position: absolute; top: 27px; height: 6px; background: #94a3b8; transition: width 0.8s ease; }
+  .led { display: inline-block; width: 20px; height: 20px; border-radius: 50%; background: #334155; margin: 0 4px; transition: all 0.3s; }
+  .led.on { background: #4ade80; box-shadow: 0 0 10px #4ade80; }
+  .led.fault { background: #ef4444; box-shadow: 0 0 10px #ef4444; }
+  .bus-line { height: 4px; background: #334155; margin: 20px 0; }
+  .slave-box { display: inline-block; padding: 8px 12px; background: #0a0e1a; border: 2px solid #334155; border-radius: 6px; margin: 4px; font-size: 12px; text-align: center; min-width: 70px; cursor: pointer; transition: all 0.3s; }
+  .slave-box.active { border-color: #4ade80; }
+  .slave-box.error { border-color: #ef4444; }
+  .switch { display: inline-block; padding: 6px 12px; background: #334155; border-radius: 4px; cursor: pointer; margin: 4px; font-size: 12px; color: #94a3b8; user-select: none; }
+  .switch.on { background: #38bdf8; color: #0a0e1a; }
+</style>
+</head>
+<body>
 
+<header>
+  <h1>🦉 SNOW<span>_OWL</span></h1>
+  <p>ELECTRICAL • INSTRUMENTATION • HYDRAULIC</p>
+</header>
+
+<input type="text" class="search" id="search" placeholder="🔍 Search formula..." oninput="searchCards()">
+
+<div class="tabs">
+  <div class="tab active" onclick="filterTab('all', this)">All</div>
+  <div class="tab" onclick="filterTab('electrical', this)">Electrical</div>
+  <div class="tab" onclick="filterTab('instrument', this)">Instrument</div>
+  <div class="tab" onclick="filterTab('hydraulic', this)">Hydraulic</div>
+  <div class="tab" onclick="filterTab('solar', this)">Solar</div>
+  <div class="tab" onclick="filterTab('units', this)">Units</div>
+  <div class="tab" onclick="filterTab('utilities', this)">Utilities</div>
+  <div class="tab" onclick="filterTab('motor', this)">Motor</div>
+  <div class="tab" onclick="filterTab('plc', this)">PLC</div>
+  <div class="tab" onclick="filterTab('sensors', this)">Sensors</div>
+</div>
+
+<div id="cards">
+
+<!-- OHM'S LAW -->
+<div class="card show" data-cat="electrical" data-name="ohms law voltage current resistance v ir">
+  <h2>Ohm's Law (V = I × R)</h2>
+  <label>Current (A)</label>
+  <input type="number" id="ohmI" placeholder="0">
+  <label>Resistance (Ω)</label>
+  <input type="number" id="ohmR" placeholder="0">
+  <button onclick="calcOhm()">Calculate Voltage</button>
+  <div class="result" id="ohmResult">—</div>
+</div>
+
+<!-- POWER -->
+<div class="card show" data-cat="electrical" data-name="power watt voltage current p vi">
+  <h2>Power (P = V × I × PF)</h2>
+  <label>Voltage (V)</label>
+  <input type="number" id="pV" placeholder="0">
+  <label>Current (A)</label>
+  <input type="number" id="pI" placeholder="0">
+  <label>Power Factor (1 = DC/Resistive)</label>
+  <input type="number" id="pPF" placeholder="1" value="1">
+  <button onclick="calcPower()">Calculate Power</button>
+  <div class="result" id="pResult">—</div>
+</div>
+
+<!-- COS THETA -->
+<div class="card show" data-cat="electrical" data-name="cos theta power factor pf angle">
+  <h2>Cos Theta (Power Factor)</h2>
+  <label>Real Power (W)</label>
+  <input type="number" id="pfW" placeholder="0">
+  <label>Apparent Power (VA)</label>
+  <input type="number" id="pfVA" placeholder="0">
+  <button onclick="calcPF()">Calculate PF</button>
+  <div class="result small" id="pfResult">—</div>
+</div>
+
+<!-- KVA TO AMPS -->
+<div class="card show" data-cat="electrical" data-name="kva amps current transformer three phase">
+  <h2>kVA to Amps</h2>
+  <label>kVA</label>
+  <input type="number" id="kvaVal" placeholder="0">
+  <label>Voltage (V)</label>
+  <input type="number" id="kvaV" placeholder="415" value="415">
+  <label>Phase</label>
+  <select id="kvaPhase">
+    <option value="1">Single Phase</option>
+    <option value="3" selected>Three Phase</option>
+  </select>
+  <button onclick="calcKVA()">Calculate Amps</button>
+  <div class="result" id="kvaResult">—</div>
+</div>
+
+<!-- WATT VA VAR -->
+<div class="card show" data-cat="electrical" data-name="watt va var power triangle">
+  <h2>Watt ↔ VA ↔ VAR</h2>
+  <label>Voltage (V)</label>
+  <input type="number" id="wvV" placeholder="0">
+  <label>Current (A)</label>
+  <input type="number" id="wvI" placeholder="0">
+  <label>Power Factor</label>
+  <input type="number" id="wvPF" placeholder="0.8" value="0.8">
+  <button onclick="calcWVA()">Calculate All</button>
+  <div class="result small" id="wvaResult">—</div>
+</div>
+
+<!-- RESISTANCE COLOR CODE -->
+<div class="card show" data-cat="electrical" data-name="resistor color code bands ohm 4 band">
+  <h2>Resistance Color Code</h2>
+  <label>Band 1 (1st digit)</label>
+  <div class="colors">
+    <select id="b1"></select>
+    <select id="b2"></select>
+    <select id="b3"></select>
+    <select id="b4"></select>
+  </div>
+  <label>Order: Band1, Band2, Multiplier, Tolerance</label>
+  <button onclick="calcResistor()">Calculate Resistance</button>
+  <div class="result" id="resResult">—</div>
+</div>
+
+<!-- TRANSISTOR -->
+<div class="card show" data-cat="electrical" data-name="transistor code breaker bc 2n tip irf mosfet">
+  <h2>Transistor Code Breaker</h2>
+  <label>Code (BC547, 2N2222, TIP122, IRF540)</label>
+  <input type="text" id="transCode" placeholder="BC547">
+  <button onclick="calcTransistor()">Lookup</button>
+  <div class="result small" id="transResult">—</div>
+</div>
+
+<!-- VOLTAGE DIVIDER -->
+<div class="card show" data-cat="electrical" data-name="voltage divider resistor vout">
+  <h2>Voltage Divider</h2>
+  <label>Input Voltage (V)</label>
+  <input type="number" id="vdVin" placeholder="0">
+  <label>R1 (Ω)</label>
+  <input type="number" id="vdR1" placeholder="0">
+  <label>R2 (Ω)</label>
+  <input type="number" id="vdR2" placeholder="0">
+  <button onclick="calcVD()">Calculate Vout</button>
+  <div class="result" id="vdResult">—</div>
+</div>
+
+<!-- LED -->
+<div class="card show" data-cat="electrical" data-name="led resistor calculation forward voltage">
+  <h2>LED Resistor Calculator</h2>
+  <label>Supply Voltage (V)</label>
+  <input type="number" id="ledVs" placeholder="12">
+  <label>LED Forward Voltage (V)</label>
+  <input type="number" id="ledVf" placeholder="2">
+  <label>LED Current (mA)</label>
+  <input type="number" id="ledI" placeholder="20">
+  <button onclick="calcLED()">Calculate Resistor</button>
+  <div class="result small" id="ledResult">—</div>
+</div>
+
+<!-- MOTOR POWER -->
+<div class="card show" data-cat="electrical" data-name="motor power hp kw torque rpm">
+  <h2>Motor Power (Torque × RPM)</h2>
+  <label>Torque (Nm)</label>
+  <input type="number" id="mT" placeholder="0">
+  <label>Speed (RPM)</label>
+  <input type="number" id="mRPM" placeholder="0">
+  <button onclick="calcMotor()">Calculate Power</button>
+  <div class="result small" id="motorResult">—</div>
+</div>
+
+<!-- CABLE -->
+<div class="card show" data-cat="electrical" data-name="cable sizing voltage drop copper aluminum">
+  <h2>Cable Voltage Drop</h2>
+  <label>Current (A)</label>
+  <input type="number" id="cabI" placeholder="0">
+  <label>Cable Length (m)</label>
+  <input type="number" id="cabL" placeholder="0">
+  <label>Cable Size (mm²)</label>
+  <input type="number" id="cabA" placeholder="0">
+  <label>Material</label>
+  <select id="cabMat">
+    <option value="0.0175">Copper (ρ=0.0175)</option>
+    <option value="0.028">Aluminum (ρ=0.028)</option>
+  </select>
+  <button onclick="calcCable()">Calculate Drop</button>
+  <div class="result small" id="cabResult">—</div>
+</div>
+
+<!-- STAR DELTA -->
+<div class="card show" data-cat="electrical" data-name="star delta conversion resistor wye">
+  <h2>Star ↔ Delta Conversion</h2>
+  <label>R1 (Ω)</label>
+  <input type="number" id="sdR1" placeholder="0">
+  <label>R2 (Ω)</label>
+  <input type="number" id="sdR2" placeholder="0">
+  <label>R3 (Ω)</label>
+  <input type="number" id="sdR3" placeholder="0">
+  <button onclick="calcStarDelta()">Convert</button>
+  <div class="result small" id="sdResult">—</div>
+</div>
+
+<!-- VFD -->
+<div class="card show" data-cat="electrical" data-name="vfd hz rpm motor speed drive">
+  <h2>VFD (Hz ↔ RPM)</h2>
+  <label>Motor Rated RPM (at 50Hz)</label>
+  <input type="number" id="vfdRPM" placeholder="1440" value="1440">
+  <label>Frequency (Hz)</label>
+  <input type="number" id="vfdHz" placeholder="50" value="50">
+  <button onclick="calcVFD()">Calculate RPM</button>
+  <div class="result" id="vfdResult">—</div>
+</div>
+
+<!-- 4-20mA -->
+<div class="card show" data-cat="instrument" data-name="4-20ma scaling transmitter lrv urv process">
+  <h2>4-20mA Scaling</h2>
+  <label>mA Reading</label>
+  <input type="number" id="mA" placeholder="4-20">
+  <label>LRV (Range Low)</label>
+  <input type="number" id="lrv" placeholder="0">
+  <label>URV (Range High)</label>
+  <input type="number" id="urv" placeholder="100">
+  <button onclick="calcMA()">Calculate Process Value</button>
+  <div class="result" id="maResult">—</div>
+</div>
+
+<!-- mA TO % -->
+<div class="card show" data-cat="instrument" data-name="ma to percent percentage signal converter">
+  <h2>mA ↔ % Converter</h2>
+  <label>mA Value (4-20)</label>
+  <input type="number" id="maPct" placeholder="12">
+  <button onclick="calcMaPct()">Calculate %</button>
+  <div class="result" id="maPctResult">—</div>
+</div>
+
+<!-- RTD -->
+<div class="card show" data-cat="instrument" data-name="rtd pt100 pt1000 temperature resistance">
+  <h2>RTD (PT100 / PT1000)</h2>
+  <label>RTD Type</label>
+  <select id="rtdType">
+    <option value="100">PT100</option>
+    <option value="1000">PT1000</option>
+  </select>
+  <label>Resistance (Ω)</label>
+  <input type="number" id="rtdR" placeholder="100">
+  <button onclick="calcRTD()">Calculate Temperature</button>
+  <div class="result" id="rtdResult">—</div>
+</div>
+
+<!-- THERMOCOUPLE -->
+<div class="card show" data-cat="instrument" data-name="thermocouple type k j t e mv temperature">
+  <h2>Thermocouple (mV → °C)</h2>
+  <label>Type</label>
+  <select id="tcType">
+    <option value="41.276">Type K (41.276 µV/°C)</option>
+    <option value="51.7">Type J (51.7 µV/°C)</option>
+    <option value="42.0">Type T (42.0 µV/°C)</option>
+    <option value="61.0">Type E (61.0 µV/°C)</option>
+  </select>
+  <label>Voltage (mV)</label>
+  <input type="number" id="tcMV" placeholder="0">
+  <button onclick="calcTC()">Calculate Temperature</button>
+  <div class="result" id="tcResult">—</div>
+</div>
+
+<!-- DP FLOW -->
+<div class="card show" data-cat="instrument" data-name="dp flow differential pressure transmitter square root">
+  <h2>DP Flow Transmitter</h2>
+  <label>DP Reading (% of span)</label>
+  <input type="number" id="dpPct" placeholder="0-100">
+  <label>Max Flow (at 100%)</label>
+  <input type="number" id="dpMax" placeholder="100">
+  <button onclick="calcDP()">Calculate Flow</button>
+  <div class="result" id="dpResult">—</div>
+</div>
+
+<!-- PID -->
+<div class="card show" data-cat="instrument" data-name="pid controller proportional integral derivative tuning">
+  <h2>PID Basics (Ziegler-Nichols)</h2>
+  <label>Ultimate Gain (Ku)</label>
+  <input type="number" id="pidKu" placeholder="0">
+  <label>Ultimate Period (Pu, sec)</label>
+  <input type="number" id="pidPu" placeholder="0">
+  <label>Controller Type</label>
+  <select id="pidType">
+    <option value="pid">PID</option>
+    <option value="pi">PI</option>
+    <option value="p">P</option>
+  </select>
+  <button onclick="calcPID()">Calculate Gains</button>
+  <div class="result small" id="pidResult">—</div>
+</div>
+
+<!-- HYD FORCE -->
+<div class="card show" data-cat="hydraulic" data-name="hydraulic cylinder force bore rod pressure push pull">
+  <h2>Hydraulic Cylinder Force</h2>
+  <label>Bore Diameter (mm)</label>
+  <input type="number" id="hBore" placeholder="50">
+  <label>Rod Diameter (mm)</label>
+  <input type="number" id="hRod" placeholder="25">
+  <label>Pressure (bar)</label>
+  <input type="number" id="hPress" placeholder="100">
+  <button onclick="calcHydForce()">Calculate Force</button>
+  <div class="result small" id="hydForceResult">—</div>
+</div>
+
+<!-- HYD PUMP -->
+<div class="card show" data-cat="hydraulic" data-name="hydraulic pump flow power displacement rpm">
+  <h2>Hydraulic Pump Power</h2>
+  <label>Displacement (cc/rev)</label>
+  <input type="number" id="hpDisp" placeholder="0">
+  <label>Speed (RPM)</label>
+  <input type="number" id="hpRPM" placeholder="0">
+  <label>Pressure (bar)</label>
+  <input type="number" id="hpPress" placeholder="0">
+  <button onclick="calcHydPump()">Calculate Power</button>
+  <div class="result small" id="hydPumpResult">—</div>
+</div>
+
+<!-- HYD SIM -->
+<div class="card show" data-cat="hydraulic" data-name="hydraulic simulation drawing animation cylinder">
+  <h2>Hydraulic Cylinder Simulation</h2>
+  <label>Pressure (bar)</label>
+  <input type="number" id="simPress" placeholder="100" value="100">
+  <label>Bore (mm)</label>
+  <input type="number" id="simBore" placeholder="50" value="50">
+  <button onclick="runSim()">▶ Run Simulation</button>
+  <div class="sim-box">
+    <div class="cylinder">
+      <div class="piston" id="piston"></div>
+      <div class="rod" id="rod"></div>
+    </div>
+    <div class="result" id="simResult">Press Run</div>
+  </div>
+</div>
+
+<!-- TORQUE -->
+<div class="card show" data-cat="hydraulic" data-name="torque ratio gear belt pulley rpm">
+  <h2>Torque / Gear Ratio</h2>
+  <label>Input Torque (Nm)</label>
+  <input type="number" id="trT1" placeholder="0">
+  <label>Input Speed (RPM)</label>
+  <input type="number" id="trRPM1" placeholder="0">
+  <label>Output Speed (RPM)</label>
+  <input type="number" id="trRPM2" placeholder="0">
+  <button onclick="calcTorque()">Calculate Output Torque</button>
+  <div class="result small" id="torqueResult">—</div>
+</div>
+
+<!-- SOLAR -->
+<div class="card show" data-cat="solar" data-name="solar panel battery inverter load calculation">
+  <h2>Solar System Calculator</h2>
+  <label>Daily Load (Wh)</label>
+  <input type="number" id="solLoad" placeholder="5000">
+  <label>Sun Hours per Day</label>
+  <input type="number" id="solSun" placeholder="5" value="5">
+  <label>Panel Wattage (W)</label>
+  <input type="number" id="solPanel" placeholder="550" value="550">
+  <label>Battery Voltage (V)</label>
+  <input type="number" id="solBatV" placeholder="12" value="12">
+  <label>Backup Days</label>
+  <input type="number" id="solDays" placeholder="1" value="1">
+  <button onclick="calcSolar()">Calculate System</button>
+  <div class="result small" id="solarResult">—</div>
+</div>
+
+<!-- BATTERY -->
+<div class="card show" data-cat="solar" data-name="battery backup time ups inverter ah">
+  <h2>Battery Backup Time</h2>
+  <label>Battery Capacity (Ah)</label>
+  <input type="number" id="batAh" placeholder="100">
+  <label>Battery Voltage (V)</label>
+  <input type="number" id="batV" placeholder="12">
+  <label>Load (W)</label>
+  <input type="number" id="batLoad" placeholder="500">
+  <label>Inverter Efficiency (%)</label>
+  <input type="number" id="batEff" placeholder="90" value="90">
+  <button onclick="calcBackup()">Calculate Backup</button>
+  <div class="result" id="batResult">—</div>
+</div>
+
+<!-- UNIT CONVERTER -->
+<div class="card show" data-cat="units" data-name="unit converter pressure temperature flow length power">
+  <h2>Unit Converter</h2>
+  <label>Category</label>
+  <select id="unitCat" onchange="updateUnits()">
+    <option value="pressure">Pressure</option>
+    <option value="temperature">Temperature</option>
+    <option value="flow">Flow</option>
+    <option value="length">Length</option>
+    <option value="power">Power</option>
+  </select>
+  <label>From</label>
+  <select id="unitFrom"></select>
+  <label>To</label>
+  <select id="unitTo"></select>
+  <label>Value</label>
+  <input type="number" id="unitVal" placeholder="0">
+  <button onclick="convertUnit()">Convert</button>
+  <div class="result" id="unitResult">—</div>
+</div>
+  
+<!-- ============ STOPWATCH ============ -->
+<div class="card show" data-cat="utilities" data-name="stopwatch timer time">
+  <h2>⏱️ Stopwatch</h2>
+  <div class="result" id="swDisplay" style="font-size:30px; font-family:monospace;">00:00:00</div>
+  <button onclick="swStart()" style="background:#4ade80;">▶ Start</button>
+  <button onclick="swStop()" style="background:#fbbf24;">⏸ Stop</button>
+  <button onclick="swReset()" style="background:#ef4444;">🔄 Reset</button>
+</div>
+
+<!-- ============ TIMER ============ -->
+<div class="card show" data-cat="utilities" data-name="timer countdown">
+  <h2>⏲️ Timer (Countdown)</h2>
+  <label>Minutes</label>
+  <input type="number" id="timerMin" placeholder="0" value="1">
+  <label>Seconds</label>
+  <input type="number" id="timerSec" placeholder="0" value="0">
+  <div class="result" id="timerDisplay" style="font-size:30px; font-family:monospace;">01:00</div>
+  <button onclick="timerStart()" style="background:#4ade80;">▶ Start</button>
+  <button onclick="timerReset()" style="background:#ef4444;">🔄 Reset</button>
+</div>
+
+<!-- ============ ALARM ============ -->
+<div class="card show" data-cat="utilities" data-name="alarm clock reminder">
+  <h2>🔔 Alarm</h2>
+  <label>Time (HH:MM)</label>
+  <input type="time" id="alarmTime" value="12:00">
+  <label>Message</label>
+  <input type="text" id="alarmMsg" value="Alarm!">
+  <button onclick="alarmSet()">🔔 Set Alarm</button>
+  <button onclick="alarmStop()" style="background:#ef4444;">🔕 Stop Alarm</button>
+  <div class="result" id="alarmResult">Not set</div>
+</div>
+
+<!-- ============ NUMBER CONVERTER ============ -->
+<div class="card show" data-cat="utilities" data-name="hex decimal binary octal converter number system">
+  <h2>🔢 Number System Converter</h2>
+  <label>Input Value</label>
+  <input type="text" id="convInput" placeholder="Enter value" value="255">
+  <label>Input Format</label>
+  <select id="convFrom">
+    <option value="dec">Decimal (10)</option>
+    <option value="hex">Hexadecimal (16)</option>
+    <option value="bin">Binary (2)</option>
+    <option value="oct">Octal (8)</option>
+  </select>
+  <button onclick="convertNumber()">Convert</button>
+  <div class="result small" id="convResult">—</div>
+</div>
+
+<!-- ============ FLOAT HEX ============ -->
+<div class="card show" data-cat="utilities" data-name="float ieee754 modbus hex conversion">
+  <h2>🔢 Float ↔ Hex (IEEE 754)</h2>
+  <label>Float Value</label>
+  <input type="number" id="floatVal" placeholder="25.5" step="0.001">
+  <button onclick="floatToHex()">Float → Hex</button>
+  <div class="result small" id="floatHexResult">—</div>
+  <label>Hex Value (8 chars)</label>
+  <input type="text" id="hexVal" placeholder="41CC0000">
+  <button onclick="hexToFloat()">Hex → Float</button>
+  <div class="result small" id="hexFloatResult">—</div>
+</div>
+<!-- ============ SCIENTIFIC CALCULATOR ============ -->
+<div class="card show" data-cat="utilities" data-name="scientific calculator math trigonometry log">
+  <h2>🧮 Scientific Calculator</h2>
+  
+  <div class="result" id="calcDisplay" style="font-size:28px; font-family:monospace; min-height:60px; padding:12px; text-align:right; overflow-x:auto;">0</div>
+  
+  <!-- Buttons Grid -->
+  <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; margin-top:12px;">
+    <button onclick="calcInput('sin')" style="background:#334155;">sin</button>
+    <button onclick="calcInput('cos')" style="background:#334155;">cos</button>
+    <button onclick="calcInput('tan')" style="background:#334155;">tan</button>
+    <button onclick="calcInput('log')" style="background:#334155;">log</button>
+    
+    <button onclick="calcInput('ln')" style="background:#334155;">ln</button>
+    <button onclick="calcInput('√')" style="background:#334155;">√</button>
+    <button onclick="calcInput('x²')" style="background:#334155;">x²</button>
+    <button onclick="calcInput('x^y')" style="background:#334155;">x^y</button>
+    
+    <button onclick="calcInput('π')" style="background:#334155;">π</button>
+    <button onclick="calcInput('e')" style="background:#334155;">e</button>
+    <button onclick="calcInput('(')" style="background:#334155;">(</button>
+    <button onclick="calcInput(')')" style="background:#334155;">)</button>
+    
+    <button onclick="calcClear()" style="background:#ef4444;">C</button>
+    <button onclick="calcDelete()" style="background:#fbbf24;">⌫</button>
+    <button onclick="calcInput('%')" style="background:#334155;">%</button>
+    <button onclick="calcInput('÷')" style="background:#334155;">÷</button>
+    
+    <button onclick="calcInput('7')">7</button>
+    <button onclick="calcInput('8')">8</button>
+    <button onclick="calcInput('9')">9</button>
+    <button onclick="calcInput('×')" style="background:#334155;">×</button>
+    
+    <button onclick="calcInput('4')">4</button>
+    <button onclick="calcInput('5')">5</button>
+    <button onclick="calcInput('6')">6</button>
+    <button onclick="calcInput('-')" style="background:#334155;">−</button>
+    
+    <button onclick="calcInput('1')">1</button>
+    <button onclick="calcInput('2')">2</button>
+    <button onclick="calcInput('3')">3</button>
+    <button onclick="calcInput('+')" style="background:#334155;">+</button>
+    
+    <button onclick="calcInput('0')">0</button>
+    <button onclick="calcInput('.')">.</button>
+    <button onclick="calcEquals()" style="background:#4ade80; grid-column:span 2;">=</button>
+  </div>
+  
+  <label style="margin-top:14px;">📜 History</label>
+  <div id="calcHistory" class="result small" style="font-family:monospace; font-size:12px; max-height:150px; overflow-y:auto; text-align:left;">
+    No history yet
+  </div>
+  <button onclick="clearHistory()" style="background:#ef4444;">🗑️ Clear History</button>
+</div>
+<!-- ============ INSTRUMENTATION TAGS ============ -->
+<div class="card show" data-cat="instrument" data-name="instrumentation tag list reference">
+  <h2>🏷️ Instrumentation Tags</h2>
+  <input type="text" class="search" id="tagSearch" placeholder="🔍 Search tag..." oninput="filterTags()" style="margin-bottom:10px;">
+  <div id="tagList" class="result small" style="max-height:400px; overflow-y:auto;"></div>
+</div>
+
+<!-- ============ 3-PHASE STAR-DELTA ============ -->
+<div class="card show" data-cat="motor" data-name="3 phase motor star delta starter simulation">
+  <h2>⚡ 3-Phase Motor — Star/Delta</h2>
+  <div class="sim-box">
+    <div style="margin:10px 0;">
+      <span class="led" id="ledMain"></span> Main
+      <span class="led" id="ledStar" style="margin-left:15px;"></span> Star
+      <span class="led" id="ledDelta" style="margin-left:15px;"></span> Delta
+      <span class="led" id="ledMotor" style="margin-left:15px;"></span> Motor
+    </div>
+    <div style="margin:10px 0;">
+      <span class="switch" id="swMain" onclick="toggleMain()">Main: OFF</span>
+    </div>
+    <div style="margin:10px 0; font-size:14px; color:#94a3b8; text-align:left;">
+      <div>Status: <span id="motorStatus" style="color:#4ade80;">Idle</span></div>
+      <div>Current: <span id="motorCurrent">0.0 A</span></div>
+      <div>Speed: <span id="motorSpeed">0 RPM</span></div>
+      <div>Timer: <span id="motorTimer">0.0 s</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ REVERSE FORWARD ============ -->
+<div class="card show" data-cat="motor" data-name="motor reverse forward direction simulation">
+  <h2>⚡ Motor Reverse / Forward</h2>
+  <div class="sim-box">
+    <div style="margin:10px 0;">
+      <span class="switch" onclick="setDirection('fwd')">FWD</span>
+      <span class="switch" onclick="setDirection('rev')">REV</span>
+      <span class="switch" onclick="setDirection('stop')">STOP</span>
+    </div>
+    <div class="result" id="dirResult">Stopped</div>
+    <div style="margin:15px 0;">
+      <div style="font-size:14px; color:#94a3b8;">Motor Direction:</div>
+      <div style="font-size:40px; color:#38bdf8; transition: all 0.3s;" id="dirArrow">⏹</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ INTERLOCK ============ -->
+<div class="card show" data-cat="motor" data-name="interlock simulation safety plc">
+  <h2>🔒 Interlock Simulation</h2>
+  <div class="sim-box">
+    <div style="margin:10px 0;">
+      <span class="switch" id="ilSw1" onclick="toggleIL(1)">SW1: OFF</span>
+      <span class="switch" id="ilSw2" onclick="toggleIL(2)">SW2: OFF</span>
+    </div>
+    <div style="margin:10px 0;">
+      <span class="led" id="ilLed1"></span> Motor 1
+      <span class="led" id="ilLed2" style="margin-left:15px;"></span> Motor 2
+    </div>
+    <div class="result small" id="ilResult">Interlock: Both motors can run independently</div>
+  </div>
+</div>
+
+<!-- ============ PID SPEED ============ -->
+<div class="card show" data-cat="motor" data-name="pid speed control sp pv motor simulation">
+  <h2>🎛️ PID Speed Control (SP/PV)</h2>
+  <div class="sim-box">
+    <label>Setpoint (SP) RPM</label>
+    <input type="number" id="pidSP" value="1500">
+    <label>Kp</label>
+    <input type="number" id="pidKp2" value="0.5" step="0.1">
+    <label>Ki</label>
+    <input type="number" id="pidKi" value="0.1" step="0.01">
+    <label>Kd</label>
+    <input type="number" id="pidKd" value="0.05" step="0.01">
+    <button onclick="pidStart()" style="background:#4ade80;">▶ Start PID</button>
+    <button onclick="pidStop()" style="background:#ef4444;">⏸ Stop</button>
+    <div class="result small" id="pidLive">
+SP: 1500 RPM
+PV: 0 RPM
+MV: 0 %
+Error: 1500
+    </div>
+    <div style="margin-top:10px; height:100px; background:#0a0e1a; border-radius:8px; position:relative; overflow:hidden;">
+      <div id="pidBar" style="position:absolute; bottom:0; left:0; width:100%; height:0%; background:linear-gradient(to top, #38bdf8, #4ade80); transition: height 0.3s;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PROFIBUS DP ============ -->
+<div class="card show" data-cat="plc" data-name="profibus dp siemens simulation dip switch">
+  <h2>🔌 Profibus DP Simulator</h2>
+  <div class="sim-box">
+    <div style="display:flex; justify-content:space-between; font-size:12px; color:#94a3b8; margin-bottom:8px;">
+      <span>Master: S7-300</span>
+      <span class="led on" id="pbMaster"></span>
+    </div>
+    <div class="bus-line"></div>
+    <div style="display:flex; flex-wrap:wrap; justify-content:center;">
+      <div class="slave-box active" id="pbSlave1" onclick="togglePB(1)">Slave 1<br><span style="color:#4ade80;">Addr 2</span><br><span class="led on" id="pbLed1"></span></div>
+      <div class="slave-box active" id="pbSlave2" onclick="togglePB(2)">Slave 2<br><span style="color:#4ade80;">Addr 3</span><br><span class="led on" id="pbLed2"></span></div>
+      <div class="slave-box active" id="pbSlave3" onclick="togglePB(3)">Slave 3<br><span style="color:#4ade80;">Addr 4</span><br><span class="led on" id="pbLed3"></span></div>
+      <div class="slave-box active" id="pbSlave4" onclick="togglePB(4)">Slave 4<br><span style="color:#4ade80;">Addr 5</span><br><span class="led on" id="pbLed4"></span></div>
+    </div>
+    <div style="margin-top:12px; text-align:left;">
+      <label style="font-size:12px;">Baud Rate</label>
+      <select id="pbBaud" onchange="updatePBStatus()">
+        <option value="9600">9.6 kbps</option>
+        <option value="19200">19.2 kbps</option>
+        <option value="93750">93.75 kbps</option>
+        <option value="187500">187.5 kbps</option>
+        <option value="500000" selected>500 kbps</option>
+        <option value="1500000">1.5 Mbps</option>
+        <option value="3000000">3 Mbps</option>
+        <option value="6000000">6 Mbps</option>
+        <option value="12000000">12 Mbps</option>
+      </select>
+    </div>
+    <div style="margin-top:10px;">
+      <span class="switch on" id="pbTerm" onclick="toggleTerm()">Terminator: ON</span>
+    </div>
+    <div class="result" id="pbStatus">✅ Bus OK</div>
+  </div>
+</div>
+
+<!-- ============ PLC LADDER ============ -->
+<div class="card show" data-cat="plc" data-name="plc ladder logic simulation siemens">
+  <h2>🪜 PLC Ladder Logic</h2>
+  <div class="sim-box">
+    <div style="margin:10px 0;">
+      <span class="switch" id="plcI1" onclick="togglePLC(1)">I0.0: OFF</span>
+      <span class="switch" id="plcI2" onclick="togglePLC(2)">I0.1: OFF</span>
+    </div>
+    <div style="background:#0a0e1a; padding:15px; border-radius:8px; margin:10px 0; font-family:monospace; font-size:13px;">
+      <div style="color:#38bdf8;">├──[ I0.0 ]──[ I0.1 ]──────( Q0.0 )──┤</div>
+      <div style="color:#64748b; margin-top:10px;">AND Logic</div>
+    </div>
+    <div style="margin:10px 0;">
+      <span class="led" id="plcLed"></span> Q0.0 Output
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODBUS TCP ============ -->
+<div class="card show" data-cat="plc" data-name="modbus tcp simulator register plc">
+  <h2>📡 Modbus TCP Simulator</h2>
+  <div class="sim-box">
+    <div style="font-size:12px; color:#94a3b8; margin-bottom:8px;">
+      IP: 192.168.0.1:502 | Unit ID: 1
+    </div>
+    <label>Register Address (0-9)</label>
+    <input type="number" id="mbAddr" value="0" min="0" max="9">
+    <label>Value</label>
+    <input type="number" id="mbVal" value="100">
+    <button onclick="mbWrite()">Write Register</button>
+    <button onclick="mbRead()" style="background:#4ade80;">Read Register</button>
+    <div class="result small" id="mbResult">—</div>
+    <label>Registers:</label>
+    <div class="result small" id="mbTable" style="font-family:monospace;">0: 0<br>1: 0<br>2: 0<br>3: 0<br>4: 0</div>
+  </div>
+</div>
+<!-- ============ VIBROMETER ============ -->
+<div class="card show" data-cat="sensors" data-name="vibrometer vibration sensor accelerometer machine">
+  <h2>📳 Vibrometer</h2>
+  
+  <div style="font-size:12px; color:#94a3b8; margin-bottom:12px;">
+    ⚠️ Phone ko machine pe rakhein — vibration read hogi
+  </div>
+  
+  <button onclick="vibStart()" style="background:#4ade80;">▶ Start</button>
+  <button onclick="vibStop()" style="background:#ef4444;">⏸ Stop</button>
+  <button onclick="vibResetAll()" style="background:#fbbf24;">🔄 Reset All</button>
+  
+  <div class="result small" id="vibStatus" style="margin-top:12px;">Not started</div>
+  
+  <!-- Live Values -->
+  <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin:12px 0;">
+    <div style="background:#0a0e1a; padding:10px; border-radius:6px; text-align:center;">
+      <div style="font-size:11px; color:#94a3b8;">X</div>
+      <div id="vibX" style="font-size:18px; color:#38bdf8; font-weight:bold;">0.00</div>
+    </div>
+    <div style="background:#0a0e1a; padding:10px; border-radius:6px; text-align:center;">
+      <div style="font-size:11px; color:#94a3b8;">Y</div>
+      <div id="vibY" style="font-size:18px; color:#38bdf8; font-weight:bold;">0.00</div>
+    </div>
+    <div style="background:#0a0e1a; padding:10px; border-radius:6px; text-align:center;">
+      <div style="font-size:11px; color:#94a3b8;">Z</div>
+      <div id="vibZ" style="font-size:18px; color:#38bdf8; font-weight:bold;">0.00</div>
+    </div>
+  </div>
+  
+  <div class="result" id="vibMagnitude" style="font-size:24px;">0.00 m/s²</div>
+  
+  <!-- Peak & Stats -->
+  <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin:12px 0;">
+    <div style="background:#0a0e1a; padding:10px; border-radius:6px; text-align:center;">
+      <div style="font-size:11px; color:#94a3b8;">Peak</div>
+      <div id="vibPeak" style="font-size:16px; color:#fbbf24; font-weight:bold;">0.00</div>
+    </div>
+    <div style="background:#0a0e1a; padding:10px; border-radius:6px; text-align:center;">
+      <div style="font-size:11px; color:#94a3b8;">Average</div>
+      <div id="vibAvg" style="font-size:16px; color:#4ade80; font-weight:bold;">0.00</div>
+    </div>
+    <div style="background:#0a0e1a; padding:10px; border-radius:6px; text-align:center;">
+      <div style="font-size:11px; color:#94a3b8;">Samples</div>
+      <div id="vibCount" style="font-size:16px; color:#38bdf8; font-weight:bold;">0</div>
+    </div>
+  </div>
+  
+  <!-- Graph -->
+  <label>📊 Live Graph (Last 100 readings)</label>
+  <canvas id="vibGraph" width="400" height="150" style="width:100%; background:#0a0e1a; border-radius:8px;"></canvas>
+  
+  <!-- History Chart -->
+  <label>📈 History Chart (Last 300 readings)</label>
+  <canvas id="vibHistoryGraph" width="400" height="100" style="width:100%; background:#0a0e1a; border-radius:8px;"></canvas>
+  
+  <!-- Alarm -->
+  <label>Alarm Threshold (m/s²)</label>
+  <input type="number" id="vibThreshold" value="15">
+  <div class="result small" id="vibAlarm">Alarm: OFF</div>
+  
+  <!-- Export -->
+  <button onclick="vibExportCSV()" style="background:#38bdf8;">📥 Export CSV</button>
+  <button onclick="vibClearHistory()" style="background:#ef4444;">🗑️ Clear History</button>
+  
+  <!-- Info -->
+  <div class="result small" style="font-size:11px; color:#64748b;">
+    💡 Phone ko machine pe rakhein. Value zyada = zyada vibration.
+  </div>
+</div>
+</div>
+  <!-- ============ PLC PROGRAMMING ============ -->
+<div class="card show" data-cat="plc" data-name="scl stl vbscript siemens plc programming">
+  <h2>💻 PLC Programming (SCL / STL / VBScript)</h2>
+  
+  <label>Select Language</label>
+  <select id="plcLang" onchange="loadPLCExample()">
+    <option value="scl">SCL (Structured Control Language)</option>
+    <option value="stl">STL (Statement List)</option>
+    <option value="vb">VBScript (WinCC Flexible)</option>
+  </select>
+  
+  <label>Example</label>
+  <select id="plcExample" onchange="loadPLCExample()">
+    <option value="motor">Motor Start/Stop</option>
+    <option value="timer">Timer (TON)</option>
+    <option value="counter">Counter (CTU)</option>
+    <option value="pid">PID Controller</option>
+    <option value="compare">Compare Values</option>
+  </select>
+  
+  <button onclick="loadPLCExample()">📖 Show Code</button>
+  
+  <div class="result small" id="plcCode" style="font-family:monospace; text-align:left; white-space:pre-wrap; font-size:12px; max-height:400px; overflow-y:auto;">
+    Select language and example above
+  </div>
+</div>
+  
+<script>
+function filterTab(cat, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.card').forEach(c => {
+    if (cat === 'all' || c.dataset.cat === cat) c.classList.add('show');
+    else c.classList.remove('show');
+  });
+}
+function searchCards() {
+  const q = document.getElementById('search').value.toLowerCase();
+  document.querySelectorAll('.card').forEach(c => {
+    const name = (c.dataset.name || '') + ' ' + c.querySelector('h2').textContent.toLowerCase();
+    if (q === '' || name.includes(q)) c.classList.add('show');
+    else c.classList.remove('show');
+  });
+}
+function show(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
+function gv(id) { const el = document.getElementById(id); return el ? (parseFloat(el.value) || 0) : 0; }
+function calcOhm() { show('ohmResult', (gv('ohmI') * gv('ohmR')).toFixed(3) + ' V'); }
+function calcPower() { show('pResult', (gv('pV') * gv('pI') * (gv('pPF') || 1)).toFixed(2) + ' W'); }
+function calcPF() {
+  const w = gv('pfW'), va = gv('pfVA');
+  if (!va) return;
+  const pf = w / va;
+  show('pfResult', 'PF = ' + pf.toFixed(3) + ' | θ = ' + (Math.acos(Math.min(pf,1)) * 180 / Math.PI).toFixed(2) + '°');
+}
+function calcKVA() {
+  const kva = gv('kvaVal'), v = gv('kvaV') || 415;
+  const ph = document.getElementById('kvaPhase').value;
+  show('kvaResult', (ph === '3' ? (kva * 1000) / (1.732 * v) : (kva * 1000) / v).toFixed(2) + ' A');
+}
+function calcWVA() {
+  const v = gv('wvV'), i = gv('wvI'), pf = gv('wvPF');
+  const va = v * i, w = va * pf;
+  const var_ = Math.sqrt(Math.max(va*va - w*w, 0));
+  show('wvaResult', 'W = ' + w.toFixed(2) + ' | VA = ' + va.toFixed(2) + ' | VAR = ' + var_.toFixed(2));
+}
+const colors = [
+  {n:'Black',d:0,m:1,t:''},{n:'Brown',d:1,m:10,t:'±1%'},{n:'Red',d:2,m:100,t:'±2%'},
+  {n:'Orange',d:3,m:1000,t:''},{n:'Yellow',d:4,m:10000,t:''},{n:'Green',d:5,m:100000,t:'±0.5%'},
+  {n:'Blue',d:6,m:1000000,t:'±0.25%'},{n:'Violet',d:7,m:10000000,t:'±0.1%'},
+  {n:'Gray',d:8,m:100000000,t:'±0.05%'},{n:'White',d:9,m:1000000000,t:''},
+  {n:'Gold',d:0,m:0.1,t:'±5%'},{n:'Silver',d:0,m:0.01,t:'±10%'}
+];
+function initColors() {
+  ['b1','b2','b3','b4'].forEach((id, i) => {
+    const sel = document.getElementById(id);
+    if (!sel || sel.options.length > 0) return;
+    colors.forEach((c, idx) => {
+      const opt = document.createElement('option');
+      opt.value = idx; opt.textContent = c.n;
+      sel.appendChild(opt);
+    });
+    if (i === 3) sel.value = 10; else sel.value = 1;
+  });
+}
+function calcResistor() {
+  const b1 = colors[document.getElementById('b1').value];
+  const b2 = colors[document.getElementById('b2').value];
+  const b3 = colors[document.getElementById('b3').value];
+  const b4 = colors[document.getElementById('b4').value];
+  const value = (b1.d * 10 + b2.d) * b3.m;
+  let d;
+  if (value >= 1e9) d = (value/1e9).toFixed(2) + ' GΩ';
+  else if (value >= 1e6) d = (value/1e6).toFixed(2) + ' MΩ';
+  else if (value >= 1e3) d = (value/1e3).toFixed(2) + ' kΩ';
+  else d = value.toFixed(2) + ' Ω';
+  show('resResult', d + ' ' + b4.t);
+}
+const transistorDB = {
+  'BC547':'NPN 45V 100mA','BC548':'NPN 30V 100mA','BC557':'PNP 45V 100mA',
+  '2N2222':'NPN 40V 800mA','2N3904':'NPN 40V 200mA','2N3055':'NPN 60V 15A',
+  'TIP120':'NPN Darlington 60V 5A','TIP122':'NPN Darlington 100V 5A',
+  'IRF540':'N-MOSFET 100V 28A','IRFZ44':'N-MOSFET 60V 50A'
+};
+function calcTransistor() {
+  const code = document.getElementById('transCode').value.toUpperCase().trim();
+  show('transResult', transistorDB[code] ? code + ': ' + transistorDB[code] : 'Not found');
+}
+function calcVD() {
+  const vin = gv('vdVin'), r1 = gv('vdR1'), r2 = gv('vdR2');
+  if (r1 + r2 === 0) return;
+  show('vdResult', (vin * (r2 / (r1 + r2))).toFixed(3) + ' V');
+}
+function calcLED() {
+  const vs = gv('ledVs'), vf = gv('ledVf'), i = gv('ledI') / 1000;
+  if (i === 0) return;
+  show('ledResult', 'R = ' + ((vs-vf)/i).toFixed(1) + ' Ω | P = ' + ((vs-vf)*i*1000).toFixed(1) + ' mW');
+}
+function calcMotor() {
+  const kW = (gv('mT') * gv('mRPM') * 2 * Math.PI) / 60000;
+  show('motorResult', kW.toFixed(3) + ' kW = ' + (kW*1.341).toFixed(2) + ' HP');
+}
+function calcCable() {
+  const I = gv('cabI'), L = gv('cabL'), A = gv('cabA');
+  const rho = parseFloat(document.getElementById('cabMat').value);
+  if (!A) return;
+  const Vd = (2 * rho * L * I) / A;
+  show('cabResult', 'Drop = ' + Vd.toFixed(3) + ' V (' + ((Vd/230)*100).toFixed(2) + '%)');
+}
+function calcStarDelta() {
+  const r1 = gv('sdR1'), r2 = gv('sdR2'), r3 = gv('sdR3');
+  const sum = r1*r2 + r2*r3 + r3*r1;
+  if (sum === 0) return;
+  show('sdResult', 'Ra=' + (sum/r3).toFixed(3) + ' Rb=' + (sum/r1).toFixed(3) + ' Rc=' + (sum/r2).toFixed(3));
+}
+function calcVFD() { show('vfdResult', (gv('vfdRPM') * gv('vfdHz') / 50).toFixed(1) + ' RPM'); }
+function calcMA() { show('maResult', (gv('lrv') + ((gv('mA') - 4) / 16) * (gv('urv') - gv('lrv'))).toFixed(3)); }
+function calcMaPct() { show('maPctResult', (((gv('maPct') - 4) / 16) * 100).toFixed(2) + ' %'); }
+function calcRTD() {
+  const R0 = parseFloat(document.getElementById('rtdType').value);
+  show('rtdResult', ((gv('rtdR') - R0) / (R0 * 0.00385)).toFixed(2) + ' °C');
+}
+function calcTC() {
+  const uV = parseFloat(document.getElementById('tcType').value);
+  show('tcResult', ((gv('tcMV') * 1000) / uV).toFixed(2) + ' °C');
+}
+function calcDP() { show('dpResult', (gv('dpMax') * Math.sqrt(gv('dpPct') / 100)).toFixed(3)); }
+function calcPID() {
+  const Ku = gv('pidKu'), Pu = gv('pidPu');
+  const type = document.getElementById('pidType').value;
+  let Kp, Ti, Td;
+  if (type === 'pid') { Kp = 0.6*Ku; Ti = 0.5*Pu; Td = 0.125*Pu; }
+  else if (type === 'pi') { Kp = 0.45*Ku; Ti = 0.83*Pu; Td = 0; }
+  else { Kp = 0.5*Ku; Ti = 0; Td = 0; }
+  show('pidResult', 'Kp=' + Kp.toFixed(3) + ' Ti=' + Ti.toFixed(2) + ' Td=' + Td.toFixed(2));
+}
+function calcHydForce() {
+  const bore = gv('hBore'), rod = gv('hRod'), press = gv('hPress');
+  const Ab = Math.PI * Math.pow(bore/2, 2);
+  const Ar = Math.PI * Math.pow(rod/2, 2);
+  show('hydForceResult', 'Push=' + ((press * 1e5 * Ab * 1e-6)/1000).toFixed(3) + ' kN | Pull=' + ((press * 1e5 * (Ab - Ar) * 1e-6)/1000).toFixed(3) + ' kN');
+}
+function calcHydPump() {
+  const flow = (gv('hpDisp') * gv('hpRPM')) / 1000;
+  show('hydPumpResult', 'Flow = ' + flow.toFixed(2) + ' L/min | Power = ' + ((flow * gv('hpPress'))/600).toFixed(2) + ' kW');
+}
+function runSim() {
+  const p = gv('simPress'), b = gv('simBore');
+  const F = (p * 1e5 * Math.PI * Math.pow(b/2, 2) * 1e-6) / 1000;
+  const piston = document.getElementById('piston'), rod = document.getElementById('rod');
+  const travel = Math.min(b * 1.5, 220);
+  piston.style.left = '5px'; rod.style.width = '0';
+  setTimeout(() => {
+    piston.style.left = travel + 'px';
+    rod.style.left = (travel + 35) + 'px';
+    rod.style.width = (250 - travel) + 'px';
+  }, 100);
+  show('simResult', 'Force = ' + F.toFixed(2) + ' kN');
+}
+function calcTorque() {
+  const T1 = gv('trT1'), rpm1 = gv('trRPM1'), rpm2 = gv('trRPM2');
+  if (!rpm2 || !rpm1) return;
+  show('torqueResult', 'Ratio = ' + (rpm1/rpm2).toFixed(3) + ':1 | Torque = ' + (T1 * rpm1/rpm2).toFixed(3) + ' Nm');
+}
+function calcSolar() {
+  const load = gv('solLoad'), sun = gv('solSun'), panel = gv('solPanel');
+  const batV = gv('solBatV'), days = gv('solDays');
+  const panels = Math.ceil(load / (sun * panel));
+  show('solarResult', 'Panels: ' + panels + ' × ' + panel + 'W | ' + ((panels*panel)/1000).toFixed(2) + ' kW | Battery: ' + ((load*days)/(batV*0.8)).toFixed(0) + ' Ah');
+}
+function calcBackup() {
+  const ah = gv('batAh'), v = gv('batV'), load = gv('batLoad'), eff = gv('batEff')/100;
+  if (!load) return;
+  show('batResult', ((ah * v * eff) / load).toFixed(2) + ' hours');
+}
+const units = {
+  pressure: { bar:1, psi:14.5038, kPa:100, MPa:0.1, atm:0.986923, mmHg:750.062 },
+  temperature: { C:'C', F:'F', K:'K' },
+  flow: { 'L/min':1, 'm³/h':0.06, 'GPM':0.264172, 'CFM':0.0353147 },
+  length: { mm:1, cm:0.1, m:0.001, inch:0.0393701, ft:0.00328084 },
+  power: { W:1, kW:0.001, HP:0.00134102, VA:1, kVA:0.001 }
+};
+function updateUnits() {
+  const cat = document.getElementById('unitCat').value;
+  const from = document.getElementById('unitFrom'), to = document.getElementById('unitTo');
+  if (!from || !to) return;
+  from.innerHTML = ''; to.innerHTML = '';
+  Object.keys(units[cat]).forEach(k => {
+    from.innerHTML += '<option value="'+k+'">'+k+'</option>';
+    to.innerHTML += '<option value="'+k+'">'+k+'</option>';
+  });
+}
+function convertUnit() {
+  const cat = document.getElementById('unitCat').value;
+  const from = document.getElementById('unitFrom').value;
+  const to = document.getElementById('unitTo').value;
+  const val = gv('unitVal');
+  let result;
+  if (cat === 'temperature') {
+    let c;
+    if (from === 'C') c = val;
+    else if (from === 'F') c = (val - 32) * 5/9;
+    else c = val - 273.15;
+    if (to === 'C') result = c;
+    else if (to === 'F') result = c * 9/5 + 32;
+    else result = c + 273.15;
+  } else {
+    result = (val / units[cat][from]) * units[cat][to];
+  }
+  show('unitResult', result.toFixed(4) + ' ' + to);
+}
+
+// STOPWATCH
+let swTime = 0, swRunning = false, swInterval;
+function swStart() {
+  if (swRunning) return;
+  swRunning = true;
+  const st = Date.now() - swTime;
+  swInterval = setInterval(() => { swTime = Date.now() - st; show('swDisplay', formatSW(swTime)); }, 50);
+}
+function swStop() { swRunning = false; clearInterval(swInterval); }
+function swReset() { swRunning = false; clearInterval(swInterval); swTime = 0; show('swDisplay', '00:00:00'); }
+function formatSW(ms) {
+  const h = Math.floor(ms/3600000), m = Math.floor((ms%3600000)/60000), s = Math.floor((ms%60000)/1000);
+  return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+}
+
+// TIMER
+let timerInt, timerRunning = false;
+function timerStart() {
+  if (timerRunning) return;
+  const m = parseInt(document.getElementById('timerMin').value) || 0;
+  const s = parseInt(document.getElementById('timerSec').value) || 0;
+  let left = (m * 60 + s) * 1000;
+  timerRunning = true;
+  const end = Date.now() + left;
+  timerInt = setInterval(() => {
+    left = end - Date.now();
+    if (left <= 0) { clearInterval(timerInt); timerRunning = false; show('timerDisplay', '00:00'); playBeep(); return; }
+    const m2 = Math.floor(left/60000), s2 = Math.floor((left%60000)/1000);
+    show('timerDisplay', String(m2).padStart(2,'0')+':'+String(s2).padStart(2,'0'));
+  }, 200);
+}
+function timerReset() { timerRunning = false; clearInterval(timerInt); show('timerDisplay', '01:00'); }
+
+// ALARM
+let alarmObj = null, alarmInt;
+function alarmSet() {
+  const t = document.getElementById('alarmTime').value;
+  const msg = document.getElementById('alarmMsg').value || 'Alarm!';
+  if (!t) return;
+  alarmObj = { time: t, msg: msg, fired: false };
+  show('alarmResult', '✅ Set for ' + t);
+  if (alarmInt) clearInterval(alarmInt);
+  alarmInt = setInterval(() => {
+    if (!alarmObj || alarmObj.fired) return;
+    const now = new Date();
+    const curr = String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+    if (curr === alarmObj.time) {
+      alarmObj.fired = true;
+      show('alarmResult', '🔔 ' + alarmObj.msg);
+      playBeep(); setTimeout(playBeep, 500); setTimeout(playBeep, 1000);
+    }
+  }, 1000);
+}
+function alarmStop() { if (alarmInt) clearInterval(alarmInt); alarmObj = null; show('alarmResult', 'Stopped'); }
+function playBeep() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator(), gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.frequency.value = 880; gain.gain.value = 0.3;
+    osc.start(); setTimeout(() => { osc.stop(); ctx.close(); }, 200);
+  } catch(e) {}
+}
+
+// NUMBER CONVERTER
+function convertNumber() {
+  const val = document.getElementById('convInput').value.trim();
+  const from = document.getElementById('convFrom').value;
+  let num;
+  try {
+    if (from === 'dec') num = parseInt(val, 10);
+    else if (from === 'hex') num = parseInt(val, 16);
+    else if (from === 'bin') num = parseInt(val, 2);
+    else if (from === 'oct') num = parseInt(val, 8);
+    if (isNaN(num)) throw new Error('Invalid');
+  } catch(e) { return show('convResult', 'Invalid input'); }
+  show('convResult', 'Decimal: ' + num + '\nHex: 0x' + num.toString(16).toUpperCase() + '\nBinary: 0b' + num.toString(2) + '\nOctal: 0o' + num.toString(8));
+}
+function floatToHex() {
+  const f = parseFloat(document.getElementById('floatVal').value);
+  if (isNaN(f)) return show('floatHexResult', 'Invalid');
+  const buf = new ArrayBuffer(4), view = new DataView(buf);
+  view.setFloat32(0, f, false);
+  const hex = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('').toUpperCase();
+  show('floatHexResult', 'Float: ' + f + '\nHex: 0x' + hex + '\nModbus: ' + hex.match(/.{1,4}/g).join(' '));
+}
+function hexToFloat() {
+  const hex = document.getElementById('hexVal').value.replace(/[^0-9a-fA-F]/g,'');
+  if (hex.length !== 8) return show('hexFloatResult', 'Enter 8 hex digits');
+  const buf = new ArrayBuffer(4), view = new DataView(buf);
+  for (let i = 0; i < 4; i++) view.setUint8(i, parseInt(hex.substr(i*2, 2), 16));
+  show('hexFloatResult', 'Hex: 0x' + hex.toUpperCase() + '\nFloat: ' + view.getFloat32(0, false));
+}
+
+// TAGS
+const tags = [
+  { tag: 'FT-101', desc: 'Flow Transmitter', range: '0-100 m³/h', signal: '4-20mA' },
+  { tag: 'PT-101', desc: 'Pressure Transmitter', range: '0-10 bar', signal: '4-20mA' },
+  { tag: 'TT-101', desc: 'Temperature Transmitter', range: '0-200 °C', signal: 'RTD PT100' },
+  { tag: 'LT-101', desc: 'Level Transmitter', range: '0-5 m', signal: '4-20mA' },
+  { tag: 'PIC-101', desc: 'Pressure Controller', range: '0-16 bar', signal: 'PID' },
+  { tag: 'TIC-101', desc: 'Temperature Controller', range: '0-400 °C', signal: 'PID' },
+  { tag: 'FIC-101', desc: 'Flow Controller', range: '0-1000 L/h', signal: 'PID' },
+  { tag: 'LIC-101', desc: 'Level Controller', range: '0-10 m', signal: 'PID' },
+  { tag: 'VFD-101', desc: 'Variable Frequency Drive', range: '0-50 Hz', signal: '4-20mA' },
+  { tag: 'PLC-101', desc: 'PLC', range: 'S7-1200', signal: 'Profibus' },
+  { tag: 'HMI-101', desc: 'HMI', range: '10 inch', signal: 'Ethernet' },
+  { tag: 'SCADA-101', desc: 'SCADA', range: 'System', signal: 'OPC UA' }
+];
+function loadTags() {
+  const list = document.getElementById('tagList');
+  if (!list) return;
+  list.innerHTML = tags.map(t => tagHTML(t)).join('');
+}
+function filterTags() {
+  const q = document.getElementById('tagSearch').value.toLowerCase();
+  const list = document.getElementById('tagList');
+  if (!list) return;
+  list.innerHTML = tags.filter(t => t.tag.toLowerCase().includes(q) || t.desc.toLowerCase().includes(q)).map(t => tagHTML(t)).join('');
+}
+function tagHTML(t) {
+  return '<div style="padding:8px;margin:5px 0;background:#0a0e1a;border-left:3px solid #38bdf8;border-radius:4px;">' +
+    '<strong style="color:#38bdf8;">' + t.tag + '</strong> — ' + t.desc + '<br>' +
+    '<span style="color:#94a3b8;font-size:12px;">' + t.range + ' | ' + t.signal + '</span></div>';
+}
+
+// MOTOR STAR-DELTA
+let motorState = { main: false, star: false, delta: false, timer: 0, speed: 0, current: 0 };
+let motorInt = null;
+function toggleMain() {
+  motorState.main = !motorState.main;
+  document.getElementById('swMain').textContent = 'Main: ' + (motorState.main ? 'ON' : 'OFF');
+  document.getElementById('swMain').classList.toggle('on', motorState.main);
+  document.getElementById('ledMain').classList.toggle('on', motorState.main);
+  if (motorState.main) {
+    motorState.timer = 0; motorState.star = true; motorState.delta = false;
+    document.getElementById('ledStar').classList.add('on');
+    document.getElementById('ledDelta').classList.remove('on');
+    if (motorInt) clearInterval(motorInt);
+    motorInt = setInterval(motorTick, 100);
+  } else {
+    motorState.star = false; motorState.delta = false;
+    motorState.speed = 0; motorState.current = 0;
+    document.getElementById('ledStar').classList.remove('on');
+    document.getElementById('ledDelta').classList.remove('on');
+    document.getElementById('ledMotor').classList.remove('on');
+    if (motorInt) clearInterval(motorInt);
+  }
+  updateMotorDisplay();
+}
+function motorTick() {
+  motorState.timer += 0.1;
+  if (motorState.timer >= 3 && motorState.star) {
+    motorState.star = false; motorState.delta = true;
+    document.getElementById('ledStar').classList.remove('on');
+    document.getElementById('ledDelta').classList.add('on');
+  }
+  if (motorState.delta) { motorState.speed = Math.min(1440, motorState.speed + 100); motorState.current = 12.5; document.getElementById('ledMotor').classList.add('on'); }
+  else if (motorState.star) { motorState.speed = Math.min(500, motorState.speed + 50); motorState.current = 25; document.getElementById('ledMotor').classList.add('on'); }
+  updateMotorDisplay();
+}
+function updateMotorDisplay() {
+  let s = 'Idle';
+  if (motorState.delta) s = 'Running (Delta) ✅';
+  else if (motorState.star) s = 'Starting (Star) ⏳';
+  else if (motorState.main) s = 'Main ON';
+  show('motorStatus', s);
+  show('motorCurrent', motorState.current.toFixed(1) + ' A');
+  show('motorSpeed', motorState.speed.toFixed(0) + ' RPM');
+  show('motorTimer', motorState.timer.toFixed(1) + ' s');
+}
+
+// REVERSE FORWARD
+function setDirection(dir) {
+  const arrow = document.getElementById('dirArrow');
+  if (dir === 'fwd') { arrow.textContent = '▶'; arrow.style.color = '#4ade80'; show('dirResult', 'Forward'); }
+  else if (dir === 'rev') { arrow.textContent = '◀'; arrow.style.color = '#fbbf24'; show('dirResult', 'Reverse'); }
+  else { arrow.textContent = '⏹'; arrow.style.color = '#ef4444'; show('dirResult', 'Stopped'); }
+}
+
+// INTERLOCK
+let ilState = { sw1: false, sw2: false };
+function toggleIL(n) {
+  if (n === 1) {
+    ilState.sw1 = !ilState.sw1;
+    document.getElementById('ilSw1').textContent = 'SW1: ' + (ilState.sw1 ? 'ON' : 'OFF');
+    document.getElementById('ilSw1').classList.toggle('on', ilState.sw1);
+  } else {
+    ilState.sw2 = !ilState.sw2;
+    document.getElementById('ilSw2').textContent = 'SW2: ' + (ilState.sw2 ? 'ON' : 'OFF');
+    document.getElementById('ilSw2').classList.toggle('on', ilState.sw2);
+  }
+  const m1 = ilState.sw1 && !ilState.sw2;
+  const m2 = ilState.sw2 && !ilState.sw1;
+  document.getElementById('ilLed1').classList.toggle('on', m1);
+  document.getElementById('ilLed2').classList.toggle('on', m2);
+  if (ilState.sw1 && ilState.sw2) {
+    show('ilResult', '⚠️ INTERLOCK ACTIVE');
+    document.getElementById('ilLed1').classList.add('fault');
+    document.getElementById('ilLed2').classList.add('fault');
+  } else {
+    document.getElementById('ilLed1').classList.remove('fault');
+    document.getElementById('ilLed2').classList.remove('fault');
+    show('ilResult', m1 ? '✅ Motor 1' : m2 ? '✅ Motor 2' : 'Both OFF');
+  }
+}
+
+// PID
+let pidState = { running: false, pv: 0, integral: 0, lastError: 0 };
+let pidInterval = null;
+function pidStart() { if (pidState.running) return; pidState.running = true; pidInterval = setInterval(pidTick, 200); }
+function pidStop() { pidState.running = false; clearInterval(pidInterval); }
+function pidTick() {
+  const sp = gv('pidSP'), kp = gv('pidKp2'), ki = gv('pidKi'), kd = gv('pidKd');
+  const error = sp - pidState.pv;
+  pidState.integral += error * 0.2;
+  const derivative = (error - pidState.lastError) / 0.2;
+  pidState.lastError = error;
+  const mv = kp * error + ki * pidState.integral + kd * derivative;
+  pidState.pv += mv * 0.5;
+  if (pidState.pv < 0) pidState.pv = 0;
+  if (pidState.pv > 3000) pidState.pv = 3000;
+  const pct = Math.min(100, (pidState.pv / sp) * 100);
+  document.getElementById('pidBar').style.height = pct + '%';
+  show('pidLive', 'SP: ' + sp + ' RPM\nPV: ' + pidState.pv.toFixed(0) + ' RPM\nMV: ' + mv.toFixed(1) + ' %\nError: ' + error.toFixed(0));
+}
+
+// PROFIB 
+  // PLC PROGRAMMING EXAMPLES
+const plcExamples = {
+  scl: {
+    motor: `// SCL — Motor Start/Stop with Seal-in
+FUNCTION_BLOCK "MotorControl"
+VAR_INPUT
+  Start : Bool;
+  Stop : Bool;
+  Overload : Bool;
+END_VAR
+VAR_OUTPUT
+  Motor : Bool;
+END_VAR
+BEGIN
+  // Seal-in logic
+  IF Start AND NOT Stop AND NOT Overload THEN
+    Motor := TRUE;
+  ELSIF Stop OR Overload THEN
+    Motor := FALSE;
+  END_IF;
+END_FUNCTION_BLOCK`,
+    
+    timer: `// SCL — On-Delay Timer (TON)
+FUNCTION_BLOCK "OnDelayTimer"
+VAR_INPUT
+  IN : Bool;
+  PT : Time;  // Preset Time
+END_VAR
+VAR_OUTPUT
+  Q : Bool;
+  ET : Time;  // Elapsed Time
+END_VAR
+VAR
+  startTime : Time;
+END_VAR
+BEGIN
+  IF IN AND NOT Q THEN
+    IF ET = T#0s THEN
+      startTime := TIME();
+    END_IF;
+    ET := TIME() - startTime;
+    IF ET >= PT THEN
+      Q := TRUE;
+    END_IF;
+  ELSE
+    ET := T#0s;
+    Q := FALSE;
+  END_IF;
+END_FUNCTION_BLOCK`,
+    
+    counter: `// SCL — Up Counter (CTU)
+FUNCTION_BLOCK "UpCounter"
+VAR_INPUT
+  CU : Bool;   // Count Up
+  R : Bool;    // Reset
+  PV : Int;    // Preset Value
+END_VAR
+VAR_OUTPUT
+  Q : Bool;
+  CV : Int;    // Current Value
+END_VAR
+VAR
+  lastCU : Bool;
+END_VAR
+BEGIN
+  IF R THEN
+    CV := 0;
+    Q := FALSE;
+  ELSIF CU AND NOT lastCU THEN
+    IF CV < PV THEN
+      CV := CV + 1;
+    END_IF;
+    IF CV >= PV THEN
+      Q := TRUE;
+    END_IF;
+  END_IF;
+  lastCU := CU;
+END_FUNCTION_BLOCK`,
+    
+    pid: `// SCL — Simple PID Controller
+FUNCTION_BLOCK "PID_Controller"
+VAR_INPUT
+  SP : Real;    // Setpoint
+  PV : Real;    // Process Value
+  Kp : Real;
+  Ki : Real;
+  Kd : Real;
+END_VAR
+VAR_OUTPUT
+  MV : Real;    // Manipulated Value
+END_VAR
+VAR
+  integral : Real;
+  lastError : Real;
+  error : Real;
+END_VAR
+BEGIN
+  error := SP - PV;
+  integral := integral + error * 0.1;
+  MV := Kp * error + Ki * integral + Kd * (error - lastError) / 0.1;
+  lastError := error;
+  // Limit output
+  IF MV > 100.0 THEN MV := 100.0; END_IF;
+  IF MV < 0.0 THEN MV := 0.0; END_IF;
+END_FUNCTION_BLOCK`,
+    
+    compare: `// SCL — Compare & Alarm
+FUNCTION_BLOCK "LevelAlarm"
+VAR_INPUT
+  Level : Real;
+  HighLimit : Real;
+  LowLimit : Real;
+END_VAR
+VAR_OUTPUT
+  HighAlarm : Bool;
+  LowAlarm : Bool;
+END_VAR
+BEGIN
+  HighAlarm := Level > HighLimit;
+  LowAlarm := Level < LowLimit;
+END_FUNCTION_BLOCK`
+  },
+  
+  stl: {
+    motor: `// STL — Motor Start/Stop (Siemens S7)
+// Inputs: I0.0 = Start, I0.1 = Stop
+// Output: Q0.0 = Motor
+
+NETWORK 1
+      A     "Start"        // Load Start
+      AN    "Stop"         // AND NOT Stop
+      AN    "Overload"     // AND NOT Overload
+      O     "Motor"        // OR Motor (seal-in)
+      =     "Motor"        // Output
+
+NETWORK 2
+      // Simple version
+      A     I0.0
+      AN    I0.1
+      =     Q0.0`,
+    
+    timer: `// STL — On-Delay Timer (SD = On-Delay)
+// Input: I0.0, Timer: T1, Preset: 5s
+
+NETWORK 1
+      A     I0.0
+      L     S5T#5S        // Preset 5 seconds
+      SD    T1            // On-delay timer
+      
+NETWORK 2
+      A     T1
+      =     Q0.0          // Output after 5s`,
+    
+    counter: `// STL — Up Counter
+// Input: I0.0 (count), I0.1 (reset)
+// Counter: C1, Preset: 10
+
+NETWORK 1
+      A     I0.0
+      CU    C1            // Count up
+      
+NETWORK 2
+      A     I0.1
+      R     C1            // Reset
+      
+NETWORK 3
+      L     C1
+      L     C#10
+      >=I
+      =     Q0.0          // Q0.0 = count >= 10`,
+    
+    pid: `// STL — PID Control (using FB41)
+// Call PID function block
+
+      CALL  "CONT_C", "PID_DB"
+       SP_INT := "Setpoint"
+       PV_IN  := "ProcessValue"
+       Kp     := "Kp_Value"
+       Ti     := "Ti_Value"
+       Td     := "Td_Value"
+       LMN    := "Output_MV"
+       MAN_ON := FALSE
+       PVPER_ON := TRUE`,
+    
+    compare: `// STL — Compare
+// Compare two values
+
+      L     MW10          // Load value from MW10
+      L     MW20          // Load value from MW20
+      >I                  // Compare: MW10 > MW20?
+      =     Q0.0          // Output if true
+      
+      L     MW10
+      L     MW20
+      <I
+      =     Q0.1          // Output if false`,
+  },
+  
+  vb: {
+    motor: `' VBScript for WinCC Flexible — Motor Start/Stop
+' Tag: Motor_Run, Start_PB, Stop_PB
+
+Sub OnStart()
+    ' Start button pressed
+    If SmartTags("Stop_PB") = False Then
+        SmartTags("Motor_Run") = True
+    End If
+End Sub
+
+Sub OnStop()
+    ' Stop button pressed
+    SmartTags("Motor_Run") = False
+End Sub
+
+Sub OnOverload()
+    ' Overload — stop motor
+    SmartTags("Motor_Run") = False
+End Sub`,
+    
+    timer: `' VBScript — Timer in WinCC Flexible
+' Tag: Timer_Value (Int), Timer_Active (Bool)
+
+Dim startTime, elapsed
+
+Sub StartTimer()
+    startTime = Now
+    SmartTags("Timer_Active") = True
+End Sub
+
+Sub StopTimer()
+    SmartTags("Timer_Active") = False
+End Sub
+
+' In cyclic script (1 second)
+Sub UpdateTimer()
+    If SmartTags("Timer_Active") = True Then
+        elapsed = DateDiff("s", startTime, Now)
+        SmartTags("Timer_Value") = elapsed
+    End If
+End Sub`,
+    
+    counter: `' VBScript — Counter
+' Tag: Count_Value (Int), Count_Reset (Bool)
+
+Sub IncrementCount()
+    If SmartTags("Count_Reset") = False Then
+        SmartTags("Count_Value") = SmartTags("Count_Value") + 1
+    End If
+End Sub
+
+Sub ResetCount()
+    SmartTags("Count_Value") = 0
+    SmartTags("Count_Reset") = False
+End Sub`,
+    
+    pid: `' VBScript — Simple PID
+' Tags: SP, PV, MV, Kp, Ki, Kd
+
+Dim integral, lastError
+
+Sub PID_Update()
+    Dim error, derivative, mv
+    error = SmartTags("SP") - SmartTags("PV")
+    integral = integral + error * 0.1
+    derivative = (error - lastError) / 0.1
+    mv = SmartTags("Kp") * error + SmartTags("Ki") * integral + SmartTags("Kd") * derivative
+    lastError = error
+    
+    ' Limit
+    If mv > 100 Then mv = 100
+    If mv < 0 Then mv = 0
+    
+    SmartTags("MV") = mv
+End Sub`,
+    
+    compare: `' VBScript — Compare & Alarm
+' Tags: Level, HighLimit, LowLimit, HighAlarm, LowAlarm
+
+Sub CheckLevel()
+    If SmartTags("Level") > SmartTags("HighLimit") Then
+        SmartTags("HighAlarm") = True
+    Else
+        SmartTags("HighAlarm") = False
+    End If
+    
+    If SmartTags("Level") < SmartTags("LowLimit") Then
+        SmartTags("LowAlarm") = True
+    Else
+        SmartTags("LowAlarm") = False
+    End If
+End Sub`
+  }
+};
+
+function loadPLCExample() {
+  const lang = document.getElementById('plcLang').value;
+  const ex = document.getElementById('plcExample').value;
+  const code = plcExamples[lang][ex];
+  if (code) {
+    document.getElementById('plcCode').textContent = code;
+  } else {
+    document.getElementById('plcCode').textContent = 'Code not found';
+  }
+}
+  // ============ SCIENTIFIC CALCULATOR ============
+let calcExpr = '';
+let calcHistoryArr = JSON.parse(localStorage.getItem('snowowl_calcHistory') || '[]');
+
+function calcInput(val) {
+  const display = document.getElementById('calcDisplay');
+  if (calcExpr === '0' && '0123456789'.includes(val)) calcExpr = '';
+  
+  // Handle special functions
+  if (val === 'sin') calcExpr += 'sin(';
+  else if (val === 'cos') calcExpr += 'cos(';
+  else if (val === 'tan') calcExpr += 'tan(';
+  else if (val === 'log') calcExpr += 'log10(';
+  else if (val === 'ln') calcExpr += 'log(';
+  else if (val === '√') calcExpr += 'sqrt(';
+  else if (val === 'x²') calcExpr += '^2';
+  else if (val === 'x^y') calcExpr += '^';
+  else if (val === 'π') calcExpr += 'π';
+  else if (val === 'e') calcExpr += 'e';
+  else calcExpr += val;
+  
+  display.textContent = calcExpr || '0';
+}
+
+function calcClear() {
+  calcExpr = '';
+  document.getElementById('calcDisplay').textContent = '0';
+}
+
+function calcDelete() {
+  calcExpr = calcExpr.slice(0, -1);
+  document.getElementById('calcDisplay').textContent = calcExpr || '0';
+}
+
+function calcEquals() {
+  if (!calcExpr) return;
+  try {
+    // Replace symbols with JS equivalents
+    let expr = calcExpr
+      .replace(/×/g, '*')
+      .replace(/÷/g, '/')
+      .replace(/−/g, '-')
+      .replace(/π/g, 'Math.PI')
+      .replace(/e(?!x)/g, 'Math.E')
+      .replace(/sqrt\(/g, 'Math.sqrt(')
+      .replace(/sin\(/g, 'Math.sin(')
+      .replace(/cos\(/g, 'Math.cos(')
+      .replace(/tan\(/g, 'Math.tan(')
+      .replace(/log10\(/g, 'Math.log10(')
+      .replace(/log\(/g, 'Math.log(')
+      .replace(/\^/g, '**');
+    
+    const result = eval(expr);
+    const display = document.getElementById('calcDisplay');
+    display.textContent = result;
+    
+    // Save to history
+    calcHistoryArr.unshift(calcExpr + ' = ' + result);
+    if (calcHistoryArr.length > 20) calcHistoryArr.pop();
+    localStorage.setItem('snowowl_calcHistory', JSON.stringify(calcHistoryArr));
+    renderHistory();
+    
+    calcExpr = result.toString();
+  } catch(e) {
+    document.getElementById('calcDisplay').textContent = 'Error';
+    calcExpr = '';
+  }
+}
+
+function renderHistory() {
+  const el = document.getElementById('calcHistory');
+  if (!el) return;
+  if (calcHistoryArr.length === 0) {
+    el.innerHTML = 'No history yet';
+  } else {
+    el.innerHTML = calcHistoryArr.map(h => '• ' + h).join('<br>');
+  }
+}
+
+function clearHistory() {
+  calcHistoryArr = [];
+  localStorage.removeItem('snowowl_calcHistory');
+  renderHistory();
+}
+
+// Initialize
+renderHistory();
+// ============ VIBROMETER ============
+let vibRunning = false;
+let vibPeak = 0;
+let vibSum = 0;
+let vibCount = 0;
+let vibLiveData = [];      // Last 100 for live graph
+let vibHistoryData = [];   // Last 300 for history
+let vibLastBeep = 0;
+let vibSessionStart = null;
+
+function vibStart() {
+  if (!window.DeviceMotionEvent) {
+    show('vibStatus', '❌ Sensor not supported on this device');
+    return;
+  }
+  if (vibRunning) return;
+  
+  vibSessionStart = new Date();
+  
+  if (typeof DeviceMotionEvent.requestPermission === 'function') {
+    DeviceMotionEvent.requestPermission().then(perm => {
+      if (perm === 'granted') {
+        window.addEventListener('devicemotion', vibHandler);
+        vibRunning = true;
+        show('vibStatus', '✅ Active — ' + vibSessionStart.toLocaleTimeString());
+      } else {
+        show('vibStatus', '❌ Permission denied');
+      }
+    }).catch(e => show('vibStatus', '❌ ' + e.message));
+  } else {
+    window.addEventListener('devicemotion', vibHandler);
+    vibRunning = true;
+    show('vibStatus', '✅ Active — ' + vibSessionStart.toLocaleTimeString());
+  }
+}
+
+function vibStop() {
+  window.removeEventListener('devicemotion', vibHandler);
+  vibRunning = false;
+  show('vibStatus', '⏸ Stopped — Total samples: ' + vibCount);
+}
+
+function vibResetAll() {
+  vibStop();
+  vibPeak = 0;
+  vibSum = 0;
+  vibCount = 0;
+  vibLiveData = [];
+  vibHistoryData = [];
+  show('vibPeak', '0.00');
+  show('vibAvg', '0.00');
+  show('vibCount', '0');
+  show('vibMagnitude', '0.00 m/s²');
+  show('vibX', '0.00');
+  show('vibY', '0.00');
+  show('vibZ', '0.00');
+  show('vibAlarm', 'Alarm: OFF');
+  show('vibStatus', 'Reset done');
+  drawVibGraph();
+  drawVibHistory();
+}
+
+function vibHandler(event) {
+  const acc = event.accelerationIncludingGravity;
+  if (!acc) return;
+  
+  const x = (acc.x || 0).toFixed(2);
+  const y = (acc.y || 0).toFixed(2);
+  const z = (acc.z || 0).toFixed(2);
+  
+  const mag = Math.sqrt(x*x + y*y + z*z);
+  const vibration = Math.abs(mag - 9.81);
+  
+  vibSum += vibration;
+  vibCount++;
+  
+  // Display
+  show('vibX', x);
+  show('vibY', y);
+  show('vibZ', z);
+  show('vibMagnitude', vibration.toFixed(2) + ' m/s²');
+  show('vibAvg', (vibSum / vibCount).toFixed(2));
+  show('vibCount', vibCount);
+  
+  // Peak
+  if (vibration > vibPeak) {
+    vibPeak = vibration;
+    show('vibPeak', vibPeak.toFixed(2));
+  }
+  
+  // Alarm
+  const threshold = parseFloat(document.getElementById('vibThreshold').value) || 15;
+  if (vibration > threshold) {
+    show('vibAlarm', '🔔 ALARM! ' + vibration.toFixed(2) + ' m/s²');
+    if (Date.now() - vibLastBeep > 1000) {
+      playBeep();
+      vibLastBeep = Date.now();
+    }
+  } else {
+    show('vibAlarm', '✅ Normal');
+  }
+  
+  // Store data
+  vibLiveData.push(vibration);
+  if (vibLiveData.length > 100) vibLiveData.shift();
+  
+  vibHistoryData.push(vibration);
+  if (vibHistoryData.length > 300) vibHistoryData.shift();
+  
+  drawVibGraph();
+  drawVibHistory();
+}
+
+function drawVibGraph() {
+  const canvas = document.getElementById('vibGraph');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  
+  ctx.fillStyle = '#0a0e1a';
+  ctx.fillRect(0, 0, w, h);
+  
+  // Grid
+  ctx.strokeStyle = '#1e293b';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    ctx.beginPath();
+    ctx.moveTo(0, i * h / 4);
+    ctx.lineTo(w, i * h / 4);
+    ctx.stroke();
+  }
+  
+  if (vibLiveData.length < 2) return;
+  const max = Math.max(...vibLiveData, 10);
+  
+  // Threshold line
+  const threshold = parseFloat(document.getElementById('vibThreshold').value) || 15;
+  if (threshold <= max) {
+    ctx.strokeStyle = '#ef4444';
+    ctx.setLineDash([5, 5]);
+    ctx.beginPath();
+    const ty = h - (threshold / max) * h;
+    ctx.moveTo(0, ty);
+    ctx.lineTo(w, ty);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  
+  // Line
+  ctx.strokeStyle = '#38bdf8';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  vibLiveData.forEach((v, i) => {
+    const x = (i / 99) * w;
+    const y = h - (v / max) * h;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+  
+  // Fill under line
+  ctx.lineTo(w, h);
+  ctx.lineTo(0, h);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(56, 189, 248, 0.15)';
+  ctx.fill();
+}
+
+function drawVibHistory() {
+  const canvas = document.getElementById('vibHistoryGraph');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  
+  ctx.fillStyle = '#0a0e1a';
+  ctx.fillRect(0, 0, w, h);
+  
+  if (vibHistoryData.length < 2) return;
+  const max = Math.max(...vibHistoryData, 10);
+  
+  // Bars
+  const barW = w / 300;
+  vibHistoryData.forEach((v, i) => {
+    const barH = (v / max) * h;
+    const x = i * barW;
+    const y = h - barH;
+    
+    // Color based on value
+    const threshold = parseFloat(document.getElementById('vibThreshold').value) || 15;
+    if (v > threshold) ctx.fillStyle = '#ef4444';
+    else if (v > threshold * 0.7) ctx.fillStyle = '#fbbf24';
+    else ctx.fillStyle = '#4ade80';
+    
+    ctx.fillRect(x, y, Math.max(barW - 0.5, 1), barH);
+  });
+  
+  // Max line
+  ctx.strokeStyle = '#fbbf24';
+  ctx.setLineDash([3, 3]);
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(w, 0);
+  ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+function vibExportCSV() {
+  if (vibHistoryData.length === 0) {
+    alert('No data to export');
+    return;
+  }
+  
+  let csv = 'Sample,Vibration (m/s²),Time\n';
+  const start = vibSessionStart || new Date();
+  vibHistoryData.forEach((v, i) => {
+    const t = new Date(start.getTime() + i * 1000);
+    csv += (i + 1) + ',' + v.toFixed(3) + ',' + t.toLocaleTimeString() + '\n';
+  });
+  
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'vibrometer_' + Date.now() + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function vibClearHistory() {
+  vibHistoryData = [];
+  vibLiveData = [];
+  drawVibGraph();
+  drawVibHistory();
+}
+  </script>
+
+</body>
+</html>
