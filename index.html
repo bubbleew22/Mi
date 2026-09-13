@@ -40,6 +40,7 @@
   <div class="tab active" onclick="filterTab('all', this)">All</div>
   <div class="tab" onclick="filterTab('electrical', this)">Electrical</div>
   <div class="tab" onclick="filterTab('instrument', this)">Instrument</div>
+ <div class="tab" onclick="filterTab('utilities', this)">Utilities</div>
 </div>
 
 <div id="cards">
@@ -76,6 +77,35 @@
   <input type="number" id="urv" placeholder="100">
   <button onclick="calcMA()">Calculate PV</button>
   <div class="result" id="maResult">—</div>
+ <!-- STOPWATCH -->
+<div class="card show" data-cat="utilities" data-name="stopwatch timer">
+  <h2>⏱️ Stopwatch</h2>
+  <div class="result" id="swDisplay" style="font-size:30px; font-family:monospace;">00:00:00</div>
+  <button onclick="swStart()" style="background:#4ade80;">▶ Start</button>
+  <button onclick="swStop()" style="background:#fbbf24;">⏸ Stop</button>
+  <button onclick="swReset()" style="background:#ef4444;">🔄 Reset</button>
+</div>
+
+<!-- TIMER -->
+<div class="card show" data-cat="utilities" data-name="timer countdown">
+  <h2>⏲️ Timer</h2>
+  <label>Minutes</label>
+  <input type="number" id="timerMin" value="1">
+  <label>Seconds</label>
+  <input type="number" id="timerSec" value="0">
+  <div class="result" id="timerDisplay" style="font-size:30px; font-family:monospace;">01:00</div>
+  <button onclick="timerStart()" style="background:#4ade80;">▶ Start</button>
+  <button onclick="timerReset()" style="background:#ef4444;">🔄 Reset</button>
+</div>
+
+<!-- ALARM -->
+<div class="card show" data-cat="utilities" data-name="alarm clock">
+  <h2>🔔 Alarm</h2>
+  <label>Time (HH:MM)</label>
+  <input type="time" id="alarmTime" value="12:00">
+  <button onclick="alarmSet()">Set Alarm</button>
+  <div class="result" id="alarmResult">Not set</div>
+</div>
 </div>
 
 </div>
@@ -106,6 +136,76 @@ function calcMA() {
 }
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js');
+}
+ // STOPWATCH
+let swTime = 0, swRunning = false, swInt;
+function swStart() {
+  if (swRunning) return;
+  swRunning = true;
+  const start = Date.now() - swTime;
+  swInt = setInterval(() => {
+    swTime = Date.now() - start;
+    document.getElementById('swDisplay').textContent = formatSW(swTime);
+  }, 50);
+}
+function swStop() { swRunning = false; clearInterval(swInt); }
+function swReset() { swRunning = false; clearInterval(swInt); swTime = 0; document.getElementById('swDisplay').textContent = '00:00:00'; }
+function formatSW(ms) {
+  const h = Math.floor(ms/3600000), m = Math.floor((ms%3600000)/60000), s = Math.floor((ms%60000)/1000);
+  return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+}
+
+// TIMER
+let timerLeft = 60000, timerRunning = false, timerInt;
+function timerStart() {
+  if (timerRunning) return;
+  const m = parseInt(document.getElementById('timerMin').value) || 0;
+  const s = parseInt(document.getElementById('timerSec').value) || 0;
+  timerLeft = (m * 60 + s) * 1000;
+  timerRunning = true;
+  const end = Date.now() + timerLeft;
+  timerInt = setInterval(() => {
+    timerLeft = end - Date.now();
+    if (timerLeft <= 0) {
+      clearInterval(timerInt);
+      timerRunning = false;
+      document.getElementById('timerDisplay').textContent = '00:00';
+      playBeep();
+      return;
+    }
+    const m2 = Math.floor(timerLeft/60000), s2 = Math.floor((timerLeft%60000)/1000);
+    document.getElementById('timerDisplay').textContent = String(m2).padStart(2,'0')+':'+String(s2).padStart(2,'0');
+  }, 200);
+}
+function timerReset() { timerRunning = false; clearInterval(timerInt); document.getElementById('timerDisplay').textContent = '01:00'; }
+
+// ALARM
+let alarmSet_ = null, alarmInt;
+function alarmSet() {
+  const t = document.getElementById('alarmTime').value;
+  alarmSet_ = { time: t, fired: false };
+  document.getElementById('alarmResult').textContent = '✅ Set for ' + t;
+  if (alarmInt) clearInterval(alarmInt);
+  alarmInt = setInterval(() => {
+    if (!alarmSet_ || alarmSet_.fired) return;
+    const now = new Date();
+    const curr = String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+    if (curr === alarmSet_.time) {
+      alarmSet_.fired = true;
+      document.getElementById('alarmResult').textContent = '🔔 ALARM!';
+      playBeep(); setTimeout(playBeep, 500); setTimeout(playBeep, 1000);
+    }
+  }, 1000);
+}
+function playBeep() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.frequency.value = 880;
+    osc.start(); setTimeout(() => { osc.stop(); ctx.close(); }, 200);
+  } catch(e) {}
 }
 </script>
 
