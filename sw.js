@@ -1,8 +1,10 @@
-const CACHE = 'snow-owl-v1';
+const CACHE = 'snow-owl-v2';
 const ASSETS = [
-  '/Mi/',
-  '/Mi/index.html',
-  '/Mi/manifest.json'
+  './',
+  './index.html',
+  './manifest.json',
+  './icon-192.png',
+  './icon-512.png'
 ];
 
 self.addEventListener('install', e => {
