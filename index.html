@@ -1701,7 +1701,10 @@ updateWireAmp();
 showVoltInfo();
 updateBusbar();
 renderHistory();
-
+// ============ SERVICE WORKER ============
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}
 </script>
 
 </body>
