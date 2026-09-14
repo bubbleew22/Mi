@@ -1353,8 +1353,9 @@ const bearingDB = {
   '6004':{bore:20,od:42,w:12,type:'Deep Groove'},'6005':{bore:25,od:47,w:12,type:'Deep Groove'},
   '6006':{bore:30,od:55,w:13,type:'Deep Groove'},'6007':{bore:35,od:62,w:14,type:'Deep Groove'},
   '6008':{bore:40,od:68,w:15,type:'Deep Groove'},'6009':{bore:45,od:75,w:16,type:'Deep Groove'},
-  '6010':{bore:  
-     '6200':{bore:10,od:30,w:9,type:'Deep Groove'},'6201':{bore:12,od:32,w:10,type:'Deep Groove'},
+ '6010':{bore:50,od:80,w:16,type:'Deep Groove'},
+ 50,od:80,w:16,type:'Deep Groove'},
+  '6200':{bore:10,od:30,w:9,type:'Deep Groove'},'6201':{bore:12,od:32,w:10,type:'Deep Groove'},
   '6202':{bore:15,od:35,w:11,type:'Deep Groove'},'6203':{bore:17,od:40,w:12,type:'Deep Groove'},
   '6204':{bore:20,od:47,w:14,type:'Deep Groove'},'6205':{bore:25,od:52,w:15,type:'Deep Groove'},
   '6206':{bore:30,od:62,w:16,type:'Deep Groove'},'6207':{bore:35,od:72,w:17,type:'Deep Groove'},
@@ -1398,7 +1399,7 @@ function lookupBearing() {
   }
 }
 
-// ============ BUSBAR ============
+// BUSBAR
 function updateBusbar() {
   const type = document.getElementById('busType').value;
   const mat = document.getElementById('busMat').value;
@@ -1410,19 +1411,17 @@ function updateBusbar() {
   if (type === 'flat') {
     const w = parseFloat(document.getElementById('busWidth').value) || 0;
     const t = parseFloat(document.getElementById('busThick').value) || 0;
-    area = w * t;
-    desc = w + ' × ' + t + ' mm';
+    area = w * t; desc = w + ' × ' + t + ' mm';
   } else {
     const d = parseFloat(document.getElementById('busDia').value) || 0;
-    area = Math.PI * Math.pow(d/2, 2);
-    desc = 'Ø' + d + ' mm';
+    area = Math.PI * Math.pow(d/2, 2); desc = 'Ø' + d + ' mm';
   }
   const ampsPerBar = area * density[type];
   const totalAmps = ampsPerBar * count;
   show('busResult', '🔶 Type: ' + (type === 'flat' ? 'Flat' : 'Round') + '\n🔶 Material: ' + (mat === 'cu' ? 'Copper' : 'Aluminum') + '\n📏 Size: ' + desc + '\n📐 Area: ' + area.toFixed(2) + ' mm²\n🔢 Count: ' + count + '\n\n⚡ Per Bar: ' + ampsPerBar.toFixed(0) + ' A\n⚡ Total: ' + totalAmps.toFixed(0) + ' A\n🔌 Power @ 415V: ' + (totalAmps * 415 * 1.732 / 1000).toFixed(2) + ' kW');
 }
 
-// ============ PERIODIC TABLE ============
+// PERIODIC TABLE
 const elements = [
   {n:1,sym:'H',name:'Hydrogen',mass:1.008},{n:2,sym:'He',name:'Helium',mass:4.0026},
   {n:3,sym:'Li',name:'Lithium',mass:6.94},{n:4,sym:'Be',name:'Beryllium',mass:9.0122},
@@ -1434,45 +1433,11 @@ const elements = [
   {n:15,sym:'P',name:'Phosphorus',mass:30.974},{n:16,sym:'S',name:'Sulfur',mass:32.06},
   {n:17,sym:'Cl',name:'Chlorine',mass:35.45},{n:18,sym:'Ar',name:'Argon',mass:39.948},
   {n:19,sym:'K',name:'Potassium',mass:39.098},{n:20,sym:'Ca',name:'Calcium',mass:40.078},
-  {n:21,sym:'Sc',name:'Scandium',mass:44.956},{n:22,sym:'Ti',name:'Titanium',mass:47.867},
-  {n:23,sym:'V',name:'Vanadium',mass:50.942},{n:24,sym:'Cr',name:'Chromium',mass:51.996},
-  {n:25,sym:'Mn',name:'Manganese',mass:54.938},{n:26,sym:'Fe',name:'Iron',mass:55.845},
-  {n:27,sym:'Co',name:'Cobalt',mass:58.933},{n:28,sym:'Ni',name:'Nickel',mass:58.693},
-  {n:29,sym:'Cu',name:'Copper',mass:63.546},{n:30,sym:'Zn',name:'Zinc',mass:65.38},
-  {n:31,sym:'Ga',name:'Gallium',mass:69.723},{n:32,sym:'Ge',name:'Germanium',mass:72.630},
-  {n:33,sym:'As',name:'Arsenic',mass:74.922},{n:34,sym:'Se',name:'Selenium',mass:78.971},
-  {n:35,sym:'Br',name:'Bromine',mass:79.904},{n:36,sym:'Kr',name:'Krypton',mass:83.798},
-  {n:37,sym:'Rb',name:'Rubidium',mass:85.468},{n:38,sym:'Sr',name:'Strontium',mass:87.62},
-  {n:39,sym:'Y',name:'Yttrium',mass:88.906},{n:40,sym:'Zr',name:'Zirconium',mass:91.224},
-  {n:41,sym:'Nb',name:'Niobium',mass:92.906},{n:42,sym:'Mo',name:'Molybdenum',mass:95.95},
-  {n:44,sym:'Ru',name:'Ruthenium',mass:101.07},{n:45,sym:'Rh',name:'Rhodium',mass:102.91},
-  {n:46,sym:'Pd',name:'Palladium',mass:106.42},{n:47,sym:'Ag',name:'Silver',mass:107.87},
-  {n:48,sym:'Cd',name:'Cadmium',mass:112.41},{n:49,sym:'In',name:'Indium',mass:114.82},
-  {n:50,sym:'Sn',name:'Tin',mass:118.71},{n:51,sym:'Sb',name:'Antimony',mass:121.76},
-  {n:52,sym:'Te',name:'Tellurium',mass:127.60},{n:53,sym:'I',name:'Iodine',mass:126.90},
-  {n:54,sym:'Xe',name:'Xenon',mass:131.29},{n:55,sym:'Cs',name:'Cesium',mass:132.91},
-  {n:56,sym:'Ba',name:'Barium',mass:137.33},{n:57,sym:'La',name:'Lanthanum',mass:138.91},
-  {n:58,sym:'Ce',name:'Cerium',mass:140.12},{n:59,sym:'Pr',name:'Praseodymium',mass:140.91},
-  {n:60,sym:'Nd',name:'Neodymium',mass:144.24},{n:62,sym:'Sm',name:'Samarium',mass:150.36},
-  {n:63,sym:'Eu',name:'Europium',mass:151.96},{n:64,sym:'Gd',name:'Gadolinium',mass:157.25},
-  {n:65,sym:'Tb',name:'Terbium',mass:158.93},{n:66,sym:'Dy',name:'Dysprosium',mass:162.50},
-  {n:67,sym:'Ho',name:'Holmium',mass:164.93},{n:68,sym:'Er',name:'Erbium',mass:167.26},
-  {n:69,sym:'Tm',name:'Thulium',mass:168.93},{n:70,sym:'Yb',name:'Ytterbium',mass:173.05},
-  {n:71,sym:'Lu',name:'Lutetium',mass:174.97},{n:72,sym:'Hf',name:'Hafnium',mass:178.49},
-  {n:73,sym:'Ta',name:'Tantalum',mass:180.95},{n:74,sym:'W',name:'Tungsten',mass:183.84},
-  {n:75,sym:'Re',name:'Rhenium',mass:186.21},{n:76,sym:'Os',name:'Osmium',mass:190.23},
-  {n:77,sym:'Ir',name:'Iridium',mass:192.22},{n:78,sym:'Pt',name:'Platinum',mass:195.08},
-  {n:79,sym:'Au',name:'Gold',mass:196.97},{n:80,sym:'Hg',name:'Mercury',mass:200.59},
-  {n:81,sym:'Tl',name:'Thallium',mass:204.38},{n:82,sym:'Pb',name:'Lead',mass:207.2},
-  {n:83,sym:'Bi',name:'Bismuth',mass:208.98},{n:84,sym:'Po',name:'Polonium',mass:209},
-  {n:85,sym:'At',name:'Astatine',mass:210},{n:86,sym:'Rn',name:'Radon',mass:222},
-  {n:87,sym:'Fr',name:'Francium',mass:223},{n:88,sym:'Ra',name:'Radium',mass:226},
-  {n:89,sym:'Ac',name:'Actinium',mass:227},{n:90,sym:'Th',name:'Thorium',mass:232.04},
-  {n:91,sym:'Pa',name:'Protactinium',mass:231.04},{n:92,sym:'U',name:'Uranium',mass:238.03},
-  {n:93,sym:'Np',name:'Neptunium',mass:237},{n:94,sym:'Pu',name:'Plutonium',mass:244},
-  {n:95,sym:'Am',name:'Americium',mass:243},{n:96,sym:'Cm',name:'Curium',mass:247},
-  {n:97,sym:'Bk',name:'Berkelium',mass:247},{n:98,sym:'Cf',name:'Californium',mass:251},
-  {n:99,sym:'Es',name:'Einsteinium',mass:252},{n:100,sym:'Fm',name:'Fermium',mass:257}
+  {n:26,sym:'Fe',name:'Iron',mass:55.845},{n:29,sym:'Cu',name:'Copper',mass:63.546},
+  {n:30,sym:'Zn',name:'Zinc',mass:65.38},{n:13,sym:'Al',name:'Aluminum',mass:26.982},
+  {n:47,sym:'Ag',name:'Silver',mass:107.87},{n:79,sym:'Au',name:'Gold',mass:196.97},
+  {n:82,sym:'Pb',name:'Lead',mass:207.2},{n:50,sym:'Sn',name:'Tin',mass:118.71},
+  {n:28,sym:'Ni',name:'Nickel',mass:58.693},{n:24,sym:'Cr',name:'Chromium',mass:51.996}
 ];
 function loadElements() {
   const list = document.getElementById('elementList');
@@ -1490,11 +1455,10 @@ function elementHTML(e) {
     '<div style="font-size:10px; color:#94a3b8;">' + e.n + '</div>' +
     '<div style="font-size:18px; color:#38bdf8; font-weight:bold;">' + e.sym + '</div>' +
     '<div style="font-size:9px; color:#64748b;">' + e.name + '</div>' +
-    '<div style="font-size:10px; color:#4ade80;">' + e.mass + '</div>' +
-    '</div>';
+    '<div style="font-size:10px; color:#4ade80;">' + e.mass + '</div></div>';
 }
 
-// ============ WIRE AMPERE ============
+// WIRE AMPERE
 const wireAmpereData = {
   cu: {
     single: { 0.5:3, 0.75:6, 1:10, 1.5:16, 2.5:22, 4:30, 6:38, 10:52, 16:70, 25:92, 35:115, 50:140, 70:180, 95:220, 120:260, 150:300, 185:345, 240:400, 300:460, 400:535 },
@@ -1518,10 +1482,10 @@ function updateWireAmp() {
   const type = document.getElementById('wireType').value;
   const mat = document.getElementById('wireMat').value;
   const amps = wireAmpereData[mat][type][size] || 0;
-  show('wireResult', '📊 Size: ' + size + ' mm²\n🧵 Type: ' + type + '\n🔶 Material: ' + (mat === 'cu' ? 'Copper' : 'Aluminum') + '\n\n⚡ Current: ' + amps + ' A\n🔌 Power @ 230V: ' + (amps * 230 / 1000).toFixed(2) + ' kW\n🔌 Power @ 415V (3Ø): ' + (amps * 415 * 1.732 / 1000).toFixed(2) + ' kW');
+  show('wireResult', '📊 Size: ' + size + ' mm²\n🧵 Type: ' + type + '\n🔶 Material: ' + (mat === 'cu' ? 'Copper' : 'Aluminum') + '\n\n⚡ Current: ' + amps + ' A\n🔌 Power @ 230V: ' + (amps * 230 / 1000).toFixed(2) + ' kW\n🔌 Power @ 415V: ' + (amps * 415 * 1.732 / 1000).toFixed(2) + ' kW');
 }
 
-// ============ VOLTAGE INFO ============
+// VOLTAGE INFO
 const voltData = {
   '12dc': { name: '12V DC', use: 'Control, PLC I/O, sensors', tol: '±10%' },
   '24dc': { name: '24V DC', use: 'Industrial control, PLC', tol: '±10%' },
@@ -1544,16 +1508,102 @@ function showVoltInfo() {
   show('voltInfo', '⚡ ' + d.name + '\n\n📍 Application: ' + d.use + '\n📏 Tolerance: ' + d.tol + '\n🔒 Safety: ' + (v.includes('kv') ? 'HIGH VOLTAGE' : v.includes('dc') ? 'DC Low' : 'AC Standard'));
 }
 
-// ============ VIBROMETER ============
-let vibRunning = false;
-let vibPeak = 0;
-let vibSum = 0;
-let vibCount = 0;
-let vibLiveData = [];
-let vibHistoryData = [];
-let vibLastBeep = 0;
-let vibSessionStart = null;
+// PLC EXAMPLES
+const plcExamples = {
+  scl: {
+    motor: "// SCL Motor Start/Stop\nFUNCTION_BLOCK MotorControl\nVAR_INPUT\n  Start : Bool;\n  Stop : Bool;\nEND_VAR\nBEGIN\n  IF Start AND NOT Stop THEN\n    Motor := TRUE;\n  END_IF;\nEND_FUNCTION_BLOCK",
+    timer: "// SCL Timer TON\nFUNCTION_BLOCK TON\nVAR_INPUT IN : Bool; PT : Time; END_VAR\nVAR_OUTPUT Q : Bool; ET : Time; END_VAR\nBEGIN\n  IF IN THEN ET := TIME() - startTime; IF ET >= PT THEN Q := TRUE; END_IF;\n  ELSE ET := T#0s; Q := FALSE;\n  END_IF;\nEND_FUNCTION_BLOCK",
+    counter: "// SCL Counter CTU\nFUNCTION_BLOCK CTU\nVAR_INPUT CU : Bool; R : Bool; PV : Int; END_VAR\nVAR_OUTPUT Q : Bool; CV : Int; END_VAR\nBEGIN\n  IF R THEN CV := 0; Q := FALSE;\n  ELSIF CU THEN CV := CV + 1;\n    IF CV >= PV THEN Q := TRUE; END_IF;\n  END_IF;\nEND_FUNCTION_BLOCK",
+    pid: "// SCL PID\nFUNCTION_BLOCK PID\nVAR_INPUT SP : Real; PV : Real; Kp : Real; Ki : Real; END_VAR\nBEGIN\n  error := SP - PV;\n  integral := integral + error * 0.1;\n  MV := Kp * error + Ki * integral;\nEND_FUNCTION_BLOCK",
+    compare: "// SCL Compare\nHighAlarm := Level > HighLimit;\nLowAlarm := Level < LowLimit;"
+  },
+  stl: {
+    motor: "// STL Motor\nA \"Start\"\nAN \"Stop\"\n= \"Motor\"",
+    timer: "// STL Timer\nA I0.0\nL S5T#5S\nSD T1\nA T1\n= Q0.0",
+    counter: "// STL Counter\nA I0.0\nCU C1\nA I0.1\nR C1\nL C1\nL C#10\n>=I\n= Q0.0",
+    pid: "// STL PID\nCALL \"CONT_C\", \"PID_DB\"\nSP_INT := \"SP\"\nPV_IN := \"PV\"\nLMN := \"MV\"",
+    compare: "// STL Compare\nL MW10\nL MW20\n>I\n= Q0.0"
+  },
+  vb: {
+    motor: "' VBScript Motor\nSub OnStart()\n  SmartTags(\"Motor\") = True\nEnd Sub\nSub OnStop()\n  SmartTags(\"Motor\") = False\nEnd Sub",
+    timer: "' VBScript Timer\nSub StartTimer()\n  startTime = Now\nEnd Sub\nSub UpdateTimer()\n  SmartTags(\"Timer\") = DateDiff(\"s\", startTime, Now)\nEnd Sub",
+    counter: "' VBScript Counter\nSub Inc()\n  SmartTags(\"Count\") = SmartTags(\"Count\") + 1\nEnd Sub",
+    pid: "' VBScript PID\nSub PID()\n  error = SmartTags(\"SP\") - SmartTags(\"PV\")\n  integral = integral + error * 0.1\n  SmartTags(\"MV\") = SmartTags(\"Kp\") * error + SmartTags(\"Ki\") * integral\nEnd Sub",
+    compare: "' VBScript Compare\nIf SmartTags(\"Level\") > SmartTags(\"High\") Then\n  SmartTags(\"Alarm\") = True\nEnd If"
+  }
+};
+function loadPLCExample() {
+  const lang = document.getElementById('plcLang').value;
+  const ex = document.getElementById('plcExample').value;
+  const code = plcExamples[lang][ex];
+  if (code) document.getElementById('plcCode').textContent = code;
+}
 
+// PROFIBUS
+let pbState = { 1: true, 2: true, 3: true, 4: true, term: true };
+function togglePB(n) {
+  pbState[n] = !pbState[n];
+  const box = document.getElementById('pbSlave' + n);
+  const led = document.getElementById('pbLed' + n);
+  if (box) box.classList.toggle('active', pbState[n]);
+  if (box) box.classList.toggle('error', !pbState[n]);
+  if (led) led.classList.toggle('on', pbState[n]);
+  if (led) led.classList.toggle('fault', !pbState[n]);
+  updatePBStatus();
+}
+function toggleTerm() {
+  pbState.term = !pbState.term;
+  const sw = document.getElementById('pbTerm');
+  sw.textContent = 'Terminator: ' + (pbState.term ? 'ON' : 'OFF');
+  sw.classList.toggle('on', pbState.term);
+  updatePBStatus();
+}
+function updatePBStatus() {
+  const active = [1,2,3,4].filter(n => pbState[n]).length;
+  const baud = document.getElementById('pbBaud').value;
+  if (active === 0) show('pbStatus', '❌ No slaves');
+  else if (!pbState.term) show('pbStatus', '⚠️ Terminator OFF');
+  else show('pbStatus', '✅ Bus OK — ' + active + ' slaves, ' + (baud/1000) + ' kbps');
+}
+
+// PLC LADDER
+let plcState = { i1: false, i2: false };
+function togglePLC(n) {
+  if (n === 1) {
+    plcState.i1 = !plcState.i1;
+    document.getElementById('plcI1').textContent = 'I0.0: ' + (plcState.i1 ? 'ON' : 'OFF');
+    document.getElementById('plcI1').classList.toggle('on', plcState.i1);
+  } else {
+    plcState.i2 = !plcState.i2;
+    document.getElementById('plcI2').textContent = 'I0.1: ' + (plcState.i2 ? 'ON' : 'OFF');
+    document.getElementById('plcI2').classList.toggle('on', plcState.i2);
+  }
+  document.getElementById('plcLed').classList.toggle('on', plcState.i1 && plcState.i2);
+}
+
+// MODBUS
+let mbRegisters = [0,0,0,0,0,0,0,0,0,0];
+function mbWrite() {
+  const addr = parseInt(document.getElementById('mbAddr').value);
+  const val = parseInt(document.getElementById('mbVal').value);
+  if (addr < 0 || addr > 9) return show('mbResult', 'Address 0-9');
+  mbRegisters[addr] = val;
+  updateMBTable();
+  show('mbResult', '✅ Register ' + addr + ' = ' + val);
+}
+function mbRead() {
+  const addr = parseInt(document.getElementById('mbAddr').value);
+  if (addr < 0 || addr > 9) return show('mbResult', 'Address 0-9');
+  show('mbResult', '📖 Register ' + addr + ' = ' + mbRegisters[addr]);
+}
+function updateMBTable() {
+  const el = document.getElementById('mbTable');
+  if (el) el.innerHTML = mbRegisters.map((v, i) => i + ': ' + v).join('<br>');
+}
+
+// VIBROMETER
+let vibRunning = false, vibPeak = 0, vibSum = 0, vibCount = 0;
+let vibLiveData = [], vibHistoryData = [], vibLastBeep = 0, vibSessionStart = null;
 function vibStart() {
   if (!window.DeviceMotionEvent) { show('vibStatus', '❌ Sensor not supported'); return; }
   if (vibRunning) return;
@@ -1563,97 +1613,98 @@ function vibStart() {
       if (perm === 'granted') {
         window.addEventListener('devicemotion', vibHandler);
         vibRunning = true;
-        show('vibStatus', '✅ Active — ' + vibSessionStart.toLocaleTimeString());
-      } else { show('vibStatus', '❌ Permission denied'); }
+        show('vibStatus', '✅ Active');
+      } else show('vibStatus', '❌ Permission denied');
     }).catch(e => show('vibStatus', '❌ ' + e.message));
   } else {
     window.addEventListener('devicemotion', vibHandler);
     vibRunning = true;
-    show('vibStatus', '✅ Active — ' + vibSessionStart.toLocaleTimeString());
+    show('vibStatus', '✅ Active');
   }
 }
 function vibStop() {
   window.removeEventListener('devicemotion', vibHandler);
   vibRunning = false;
-  show('vibStatus', '⏸ Stopped — Total samples: ' + vibCount);
+  show('vibStatus', '⏸ Stopped — Samples: ' + vibCount);
 }
 function vibResetAll() {
   vibStop();
-  vibPeak = 0; vibSum = 0; vibCount = 0;
-  vibLiveData = []; vibHistoryData = [];
-  show('vibPeak', '0.00'); show('vibAvg', '0.00'); show('vibCount', '0');
-  show('vibMagnitude', '0.00 m/s²'); show('vibX', '0.00'); show('vibY', '0.00'); show('vibZ', '0.00');
-  show('vibAlarm', 'Alarm: OFF'); show('vibStatus', 'Reset done');
+  vibPeak = 0; vibSum = 0; vibCount = 0; vibLiveData = []; vibHistoryData = [];
+  ['vibPeak','vibAvg','vibCount','vibX','vibY','vibZ'].forEach(id => show(id, '0.00'));
+  show('vibMagnitude', '0.00 m/s²');
   drawVibGraph(); drawVibHistory();
 }
 function vibHandler(event) {
   const acc = event.accelerationIncludingGravity;
   if (!acc) return;
-  const x = (acc.x || 0).toFixed(2);
-  const y = (acc.y || 0).toFixed(2);
-  const z = (acc.z || 0).toFixed(2);
+  const x = (acc.x || 0).toFixed(2), y = (acc.y || 0).toFixed(2), z = (acc.z || 0).toFixed(2);
   const mag = Math.sqrt(x*x + y*y + z*z);
-  const vibration = Math.abs(mag - 9.81);
-  vibSum += vibration; vibCount++;
+  const v = Math.abs(mag - 9.81);
+  vibSum += v; vibCount++;
   show('vibX', x); show('vibY', y); show('vibZ', z);
-  show('vibMagnitude', vibration.toFixed(2) + ' m/s²');
+  show('vibMagnitude', v.toFixed(2) + ' m/s²');
   show('vibAvg', (vibSum / vibCount).toFixed(2));
   show('vibCount', vibCount);
-  if (vibration > vibPeak) { vibPeak = vibration; show('vibPeak', vibPeak.toFixed(2)); }
-  const threshold = parseFloat(document.getElementById('vibThreshold').value) || 15;
-  if (vibration > threshold) {
-    show('vibAlarm', '🔔 ALARM! ' + vibration.toFixed(2) + ' m/s²');
+  if (v > vibPeak) { vibPeak = v; show('vibPeak', vibPeak.toFixed(2)); }
+  const th = parseFloat(document.getElementById('vibThreshold').value) || 15;
+  if (v > th) {
+    show('vibAlarm', '🔔 ALARM! ' + v.toFixed(2));
     if (Date.now() - vibLastBeep > 1000) { playBeep(); vibLastBeep = Date.now(); }
-  } else { show('vibAlarm', '✅ Normal'); }
-  vibLiveData.push(vibration);
-  if (vibLiveData.length > 100) vibLiveData.shift();
-  vibHistoryData.push(vibration);
-  if (vibHistoryData.length > 300) vibHistoryData.shift();
+  } else show('vibAlarm', '✅ Normal');
+  vibLiveData.push(v); if (vibLiveData.length > 100) vibLiveData.shift();
+  vibHistoryData.push(v); if (vibHistoryData.length > 300) vibHistoryData.shift();
   drawVibGraph(); drawVibHistory();
 }
 function drawVibGraph() {
-  const canvas = document.getElementById('vibGraph');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const w = canvas.width, h = canvas.height;
+  const c = document.getElementById('vibGraph'); if (!c) return;
+  const ctx = c.getContext('2d'); const w = c.width, h = c.height;
   ctx.fillStyle = '#0a0e1a'; ctx.fillRect(0, 0, w, h);
-  ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 1;
-  for (let i = 0; i <= 4; i++) { ctx.beginPath(); ctx.moveTo(0, i * h / 4); ctx.lineTo(w, i * h / 4); ctx.stroke(); }
   if (vibLiveData.length < 2) return;
   const max = Math.max(...vibLiveData, 10);
-  const threshold = parseFloat(document.getElementById('vibThreshold').value) || 15;
-  if (threshold <= max) {
-    ctx.strokeStyle = '#ef4444'; ctx.setLineDash([5, 5]);
-    ctx.beginPath(); const ty = h - (threshold / max) * h;
-    ctx.moveTo(0, ty); ctx.lineTo(w, ty); ctx.stroke();
-    ctx.setLineDash([]);
-  }
   ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 2;
   ctx.beginPath();
   vibLiveData.forEach((v, i) => {
-    const x = (i / 99) * w; const y = h - (v / max) * h;
+    const x = (i/99) * w, y = h - (v/max) * h;
     if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
   });
   ctx.stroke();
-  ctx.lineTo(w, h); ctx.lineTo(0, h); ctx.closePath();
-  ctx.fillStyle = 'rgba(56, 189, 248, 0.15)'; ctx.fill();
 }
 function drawVibHistory() {
-  const canvas = document.getElementById('vibHistoryGraph');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const w = canvas.width, h = canvas.height;
+  const c = document.getElementById('vibHistoryGraph'); if (!c) return;
+  const ctx = c.getContext('2d'); const w = c.width, h = c.height;
   ctx.fillStyle = '#0a0e1a'; ctx.fillRect(0, 0, w, h);
   if (vibHistoryData.length < 2) return;
   const max = Math.max(...vibHistoryData, 10);
   const barW = w / 300;
-  const threshold = parseFloat(document.getElementById('vibThreshold').value) || 15;
   vibHistoryData.forEach((v, i) => {
-    const barH = (v / max) * h;
-    const x = i * barW;
-    const y = h - barH;
-    if (v > threshold) ctx.fillStyle = '#ef4444';
-    else if (v > threshold * 0.
+    ctx.fillStyle = '#4ade80';
+    ctx.fillRect(i * barW, h - (v/max) * h, Math.max(barW - 0.5, 1), (v/max) * h);
+  });
+}
+function vibExportCSV() {
+  if (vibHistoryData.length === 0) { alert('No data'); return; }
+  let csv = 'Sample,Vibration\n';
+  vibHistoryData.forEach((v, i) => csv += (i+1) + ',' + v.toFixed(3) + '\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'vibrometer_' + Date.now() + '.csv'; a.click();
+  URL.revokeObjectURL(url);
+}
+function vibClearHistory() { vibHistoryData = []; vibLiveData = []; drawVibGraph(); drawVibHistory(); }
+
+// INIT
+initColors();
+updateUnits();
+loadTags();
+updateMBTable();
+updatePBStatus();
+loadElements();
+updateWireAmp();
+showVoltInfo();
+updateBusbar();
+renderHistory();
+
 </script>
 
 </body>
