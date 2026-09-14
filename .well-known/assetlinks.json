@@ -2,7 +2,7 @@
       "relation": ["delegate_permission/common.handle_all_urls"],
       "target": {
         "namespace": "android_app",
-        "package_name": "wa.me923139757267",
-        "sha256_cert_fingerprints": ["17:B9:2C:D9:AC:6B:8F:69:B4:C3:1C:72:D1:79:20:8F:5C:90:9B:00:3A:45:E3:B4:2C:7E:DE:3D:96:FB:AA:4E"]
+        "package_name": "io.github.bubbleew22.twa",
+        "sha256_cert_fingerprints": ["5A:8A:49:AD:C3:61:09:2A:49:27:13:D0:52:41:43:A7:D6:57:3B:8B:BA:C9:58:4D:C4:71:BD:1D:D4:9F:23:D2"]
       }
     }]
