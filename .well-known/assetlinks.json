@@ -3,6 +3,7 @@
       "target": {
         "namespace": "android_app",
         "package_name": "io.github.bubbleew22.twa",
-        "sha256_cert_fingerprints": ["5A:8A:49:AD:C3:61:09:2A:49:27:13:D0:52:41:43:A7:D6:57:3B:8B:BA:C9:58:4D:C4:71:BD:1D:D4:9F:23:D2"]
+        "sha256_cert_fingerprints": ["5E:70:0A:56:42:5A:EB:AB:29:72:88:7D:AE:23:CC:5E:B2:0C:C8:7B:3E:6E:AF:06:F6:93:E9:C3:89:40:64:FD"]
       }
     }]
+
