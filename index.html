@@ -1354,6 +1354,306 @@ const bearingDB = {
   '6006':{bore:30,od:55,w:13,type:'Deep Groove'},'6007':{bore:35,od:62,w:14,type:'Deep Groove'},
   '6008':{bore:40,od:68,w:15,type:'Deep Groove'},'6009':{bore:45,od:75,w:16,type:'Deep Groove'},
   '6010':{bore:  
+     '6200':{bore:10,od:30,w:9,type:'Deep Groove'},'6201':{bore:12,od:32,w:10,type:'Deep Groove'},
+  '6202':{bore:15,od:35,w:11,type:'Deep Groove'},'6203':{bore:17,od:40,w:12,type:'Deep Groove'},
+  '6204':{bore:20,od:47,w:14,type:'Deep Groove'},'6205':{bore:25,od:52,w:15,type:'Deep Groove'},
+  '6206':{bore:30,od:62,w:16,type:'Deep Groove'},'6207':{bore:35,od:72,w:17,type:'Deep Groove'},
+  '6208':{bore:40,od:80,w:18,type:'Deep Groove'},'6209':{bore:45,od:85,w:19,type:'Deep Groove'},
+  '6210':{bore:50,od:90,w:20,type:'Deep Groove'},'6211':{bore:55,od:100,w:21,type:'Deep Groove'},
+  '6212':{bore:60,od:110,w:22,type:'Deep Groove'},
+  '6300':{bore:10,od:35,w:11,type:'Deep Groove'},'6301':{bore:12,od:37,w:12,type:'Deep Groove'},
+  '6302':{bore:15,od:42,w:13,type:'Deep Groove'},'6303':{bore:17,od:47,w:14,type:'Deep Groove'},
+  '6304':{bore:20,od:52,w:15,type:'Deep Groove'},'6305':{bore:25,od:62,w:17,type:'Deep Groove'},
+  '6306':{bore:30,od:72,w:19,type:'Deep Groove'},'6307':{bore:35,od:80,w:21,type:'Deep Groove'},
+  '6308':{bore:40,od:90,w:23,type:'Deep Groove'},'6309':{bore:45,od:100,w:25,type:'Deep Groove'},
+  '6310':{bore:50,od:110,w:27,type:'Deep Groove'},'6311':{bore:55,od:120,w:29,type:'Deep Groove'},
+  '6312':{bore:60,od:130,w:31,type:'Deep Groove'},
+  '22205':{bore:25,od:52,w:18,type:'Spherical Roller'},'22206':{bore:30,od:62,w:20,type:'Spherical Roller'},
+  '22207':{bore:35,od:72,w:23,type:'Spherical Roller'},'22208':{bore:40,od:80,w:23,type:'Spherical Roller'},
+  '22209':{bore:45,od:85,w:23,type:'Spherical Roller'},'22210':{bore:50,od:90,w:23,type:'Spherical Roller'},
+  '22211':{bore:55,od:100,w:25,type:'Spherical Roller'},'22212':{bore:60,od:110,w:28,type:'Spherical Roller'},
+  '22213':{bore:65,od:120,w:31,type:'Spherical Roller'},'22214':{bore:70,od:125,w:31,type:'Spherical Roller'},
+  '22215':{bore:75,od:130,w:31,type:'Spherical Roller'},'22216':{bore:80,od:140,w:33,type:'Spherical Roller'},
+  '22217':{bore:85,od:150,w:36,type:'Spherical Roller'},'22218':{bore:90,od:160,w:40,type:'Spherical Roller'},
+  '22219':{bore:95,od:170,w:43,type:'Spherical Roller'},'22220':{bore:100,od:180,w:46,type:'Spherical Roller'},
+  '30204':{bore:20,od:47,w:15.25,type:'Taper Roller'},'30205':{bore:25,od:52,w:16.25,type:'Taper Roller'},
+  '30206':{bore:30,od:62,w:17.25,type:'Taper Roller'},'30207':{bore:35,od:72,w:18.25,type:'Taper Roller'},
+  '30208':{bore:40,od:80,w:19.75,type:'Taper Roller'},'30209':{bore:45,od:85,w:20.75,type:'Taper Roller'},
+  '30210':{bore:50,od:90,w:21.75,type:'Taper Roller'},'30211':{bore:55,od:100,w:22.75,type:'Taper Roller'},
+  '30212':{bore:60,od:110,w:23.75,type:'Taper Roller'},'30213':{bore:65,od:120,w:24.75,type:'Taper Roller'},
+  '30214':{bore:70,od:125,w:26.25,type:'Taper Roller'},'30215':{bore:75,od:130,w:27.25,type:'Taper Roller'},
+  '30216':{bore:80,od:140,w:28.25,type:'Taper Roller'},
+  '1204':{bore:20,od:47,w:14,type:'Self-aligning'},'1205':{bore:25,od:52,w:15,type:'Self-aligning'},
+  '1206':{bore:30,od:62,w:16,type:'Self-aligning'},'1207':{bore:35,od:72,w:17,type:'Self-aligning'},
+  '1208':{bore:40,od:80,w:18,type:'Self-aligning'},'1209':{bore:45,od:85,w:19,type:'Self-aligning'},
+  '1210':{bore:50,od:90,w:20,type:'Self-aligning'}
+};
+function lookupBearing() {
+  const code = document.getElementById('bearingCode').value.trim().toUpperCase();
+  const b = bearingDB[code];
+  if (b) {
+    show('bearingResult', '🔧 ' + code + '\n📏 Type: ' + b.type + '\n\n⚙️ Bore (d): ' + b.bore + ' mm\n⚙️ OD (D): ' + b.od + ' mm\n⚙️ Width (B): ' + b.w + ' mm');
+  } else {
+    show('bearingResult', '❌ Not found. Try: 6205, 6305, 22210, 30205');
+  }
+}
+
+// ============ BUSBAR ============
+function updateBusbar() {
+  const type = document.getElementById('busType').value;
+  const mat = document.getElementById('busMat').value;
+  const count = parseInt(document.getElementById('busCount').value) || 1;
+  document.getElementById('flatInputs').style.display = type === 'flat' ? 'block' : 'none';
+  document.getElementById('roundInputs').style.display = type === 'round' ? 'block' : 'none';
+  const density = mat === 'cu' ? { flat: 1.6, round: 1.4 } : { flat: 1.2, round: 1.0 };
+  let area = 0, desc = '';
+  if (type === 'flat') {
+    const w = parseFloat(document.getElementById('busWidth').value) || 0;
+    const t = parseFloat(document.getElementById('busThick').value) || 0;
+    area = w * t;
+    desc = w + ' × ' + t + ' mm';
+  } else {
+    const d = parseFloat(document.getElementById('busDia').value) || 0;
+    area = Math.PI * Math.pow(d/2, 2);
+    desc = 'Ø' + d + ' mm';
+  }
+  const ampsPerBar = area * density[type];
+  const totalAmps = ampsPerBar * count;
+  show('busResult', '🔶 Type: ' + (type === 'flat' ? 'Flat' : 'Round') + '\n🔶 Material: ' + (mat === 'cu' ? 'Copper' : 'Aluminum') + '\n📏 Size: ' + desc + '\n📐 Area: ' + area.toFixed(2) + ' mm²\n🔢 Count: ' + count + '\n\n⚡ Per Bar: ' + ampsPerBar.toFixed(0) + ' A\n⚡ Total: ' + totalAmps.toFixed(0) + ' A\n🔌 Power @ 415V: ' + (totalAmps * 415 * 1.732 / 1000).toFixed(2) + ' kW');
+}
+
+// ============ PERIODIC TABLE ============
+const elements = [
+  {n:1,sym:'H',name:'Hydrogen',mass:1.008},{n:2,sym:'He',name:'Helium',mass:4.0026},
+  {n:3,sym:'Li',name:'Lithium',mass:6.94},{n:4,sym:'Be',name:'Beryllium',mass:9.0122},
+  {n:5,sym:'B',name:'Boron',mass:10.81},{n:6,sym:'C',name:'Carbon',mass:12.011},
+  {n:7,sym:'N',name:'Nitrogen',mass:14.007},{n:8,sym:'O',name:'Oxygen',mass:15.999},
+  {n:9,sym:'F',name:'Fluorine',mass:18.998},{n:10,sym:'Ne',name:'Neon',mass:20.180},
+  {n:11,sym:'Na',name:'Sodium',mass:22.990},{n:12,sym:'Mg',name:'Magnesium',mass:24.305},
+  {n:13,sym:'Al',name:'Aluminum',mass:26.982},{n:14,sym:'Si',name:'Silicon',mass:28.085},
+  {n:15,sym:'P',name:'Phosphorus',mass:30.974},{n:16,sym:'S',name:'Sulfur',mass:32.06},
+  {n:17,sym:'Cl',name:'Chlorine',mass:35.45},{n:18,sym:'Ar',name:'Argon',mass:39.948},
+  {n:19,sym:'K',name:'Potassium',mass:39.098},{n:20,sym:'Ca',name:'Calcium',mass:40.078},
+  {n:21,sym:'Sc',name:'Scandium',mass:44.956},{n:22,sym:'Ti',name:'Titanium',mass:47.867},
+  {n:23,sym:'V',name:'Vanadium',mass:50.942},{n:24,sym:'Cr',name:'Chromium',mass:51.996},
+  {n:25,sym:'Mn',name:'Manganese',mass:54.938},{n:26,sym:'Fe',name:'Iron',mass:55.845},
+  {n:27,sym:'Co',name:'Cobalt',mass:58.933},{n:28,sym:'Ni',name:'Nickel',mass:58.693},
+  {n:29,sym:'Cu',name:'Copper',mass:63.546},{n:30,sym:'Zn',name:'Zinc',mass:65.38},
+  {n:31,sym:'Ga',name:'Gallium',mass:69.723},{n:32,sym:'Ge',name:'Germanium',mass:72.630},
+  {n:33,sym:'As',name:'Arsenic',mass:74.922},{n:34,sym:'Se',name:'Selenium',mass:78.971},
+  {n:35,sym:'Br',name:'Bromine',mass:79.904},{n:36,sym:'Kr',name:'Krypton',mass:83.798},
+  {n:37,sym:'Rb',name:'Rubidium',mass:85.468},{n:38,sym:'Sr',name:'Strontium',mass:87.62},
+  {n:39,sym:'Y',name:'Yttrium',mass:88.906},{n:40,sym:'Zr',name:'Zirconium',mass:91.224},
+  {n:41,sym:'Nb',name:'Niobium',mass:92.906},{n:42,sym:'Mo',name:'Molybdenum',mass:95.95},
+  {n:44,sym:'Ru',name:'Ruthenium',mass:101.07},{n:45,sym:'Rh',name:'Rhodium',mass:102.91},
+  {n:46,sym:'Pd',name:'Palladium',mass:106.42},{n:47,sym:'Ag',name:'Silver',mass:107.87},
+  {n:48,sym:'Cd',name:'Cadmium',mass:112.41},{n:49,sym:'In',name:'Indium',mass:114.82},
+  {n:50,sym:'Sn',name:'Tin',mass:118.71},{n:51,sym:'Sb',name:'Antimony',mass:121.76},
+  {n:52,sym:'Te',name:'Tellurium',mass:127.60},{n:53,sym:'I',name:'Iodine',mass:126.90},
+  {n:54,sym:'Xe',name:'Xenon',mass:131.29},{n:55,sym:'Cs',name:'Cesium',mass:132.91},
+  {n:56,sym:'Ba',name:'Barium',mass:137.33},{n:57,sym:'La',name:'Lanthanum',mass:138.91},
+  {n:58,sym:'Ce',name:'Cerium',mass:140.12},{n:59,sym:'Pr',name:'Praseodymium',mass:140.91},
+  {n:60,sym:'Nd',name:'Neodymium',mass:144.24},{n:62,sym:'Sm',name:'Samarium',mass:150.36},
+  {n:63,sym:'Eu',name:'Europium',mass:151.96},{n:64,sym:'Gd',name:'Gadolinium',mass:157.25},
+  {n:65,sym:'Tb',name:'Terbium',mass:158.93},{n:66,sym:'Dy',name:'Dysprosium',mass:162.50},
+  {n:67,sym:'Ho',name:'Holmium',mass:164.93},{n:68,sym:'Er',name:'Erbium',mass:167.26},
+  {n:69,sym:'Tm',name:'Thulium',mass:168.93},{n:70,sym:'Yb',name:'Ytterbium',mass:173.05},
+  {n:71,sym:'Lu',name:'Lutetium',mass:174.97},{n:72,sym:'Hf',name:'Hafnium',mass:178.49},
+  {n:73,sym:'Ta',name:'Tantalum',mass:180.95},{n:74,sym:'W',name:'Tungsten',mass:183.84},
+  {n:75,sym:'Re',name:'Rhenium',mass:186.21},{n:76,sym:'Os',name:'Osmium',mass:190.23},
+  {n:77,sym:'Ir',name:'Iridium',mass:192.22},{n:78,sym:'Pt',name:'Platinum',mass:195.08},
+  {n:79,sym:'Au',name:'Gold',mass:196.97},{n:80,sym:'Hg',name:'Mercury',mass:200.59},
+  {n:81,sym:'Tl',name:'Thallium',mass:204.38},{n:82,sym:'Pb',name:'Lead',mass:207.2},
+  {n:83,sym:'Bi',name:'Bismuth',mass:208.98},{n:84,sym:'Po',name:'Polonium',mass:209},
+  {n:85,sym:'At',name:'Astatine',mass:210},{n:86,sym:'Rn',name:'Radon',mass:222},
+  {n:87,sym:'Fr',name:'Francium',mass:223},{n:88,sym:'Ra',name:'Radium',mass:226},
+  {n:89,sym:'Ac',name:'Actinium',mass:227},{n:90,sym:'Th',name:'Thorium',mass:232.04},
+  {n:91,sym:'Pa',name:'Protactinium',mass:231.04},{n:92,sym:'U',name:'Uranium',mass:238.03},
+  {n:93,sym:'Np',name:'Neptunium',mass:237},{n:94,sym:'Pu',name:'Plutonium',mass:244},
+  {n:95,sym:'Am',name:'Americium',mass:243},{n:96,sym:'Cm',name:'Curium',mass:247},
+  {n:97,sym:'Bk',name:'Berkelium',mass:247},{n:98,sym:'Cf',name:'Californium',mass:251},
+  {n:99,sym:'Es',name:'Einsteinium',mass:252},{n:100,sym:'Fm',name:'Fermium',mass:257}
+];
+function loadElements() {
+  const list = document.getElementById('elementList');
+  if (!list) return;
+  list.innerHTML = elements.map(e => elementHTML(e)).join('');
+}
+function filterElements() {
+  const q = document.getElementById('elementSearch').value.toLowerCase();
+  const list = document.getElementById('elementList');
+  if (!list) return;
+  list.innerHTML = elements.filter(e => e.name.toLowerCase().includes(q) || e.sym.toLowerCase().includes(q) || String(e.n).includes(q)).map(e => elementHTML(e)).join('');
+}
+function elementHTML(e) {
+  return '<div style="background:#0a0e1a; padding:6px; border-radius:4px; border-left:2px solid #38bdf8; text-align:center;">' +
+    '<div style="font-size:10px; color:#94a3b8;">' + e.n + '</div>' +
+    '<div style="font-size:18px; color:#38bdf8; font-weight:bold;">' + e.sym + '</div>' +
+    '<div style="font-size:9px; color:#64748b;">' + e.name + '</div>' +
+    '<div style="font-size:10px; color:#4ade80;">' + e.mass + '</div>' +
+    '</div>';
+}
+
+// ============ WIRE AMPERE ============
+const wireAmpereData = {
+  cu: {
+    single: { 0.5:3, 0.75:6, 1:10, 1.5:16, 2.5:22, 4:30, 6:38, 10:52, 16:70, 25:92, 35:115, 50:140, 70:180, 95:220, 120:260, 150:300, 185:345, 240:400, 300:460, 400:535 },
+    '2core': { 0.5:3, 0.75:5, 1:8, 1.5:13, 2.5:18, 4:25, 6:32, 10:44, 16:60, 25:80, 35:100, 50:125, 70:160, 95:195, 120:230, 150:265, 185:300, 240:350, 300:400, 400:465 },
+    '3core': { 0.5:3, 0.75:5, 1:8, 1.5:12, 2.5:17, 4:23, 6:30, 10:40, 16:55, 25:75, 35:95, 50:120, 70:150, 95:185, 120:215, 150:250, 185:285, 240:335, 300:385, 400:445 },
+    '4core': { 0.5:2, 0.75:4, 1:7, 1.5:11, 2.5:15, 4:21, 6:27, 10:37, 16:50, 25:68, 35:85, 50:110, 70:140, 95:170, 120:200, 150:230, 185:265, 240:310, 300:355, 400:415 },
+    buried: { 0.5:4, 0.75:8, 1:12, 1.5:18, 2.5:24, 4:32, 6:40, 10:55, 16:75, 25:95, 35:120, 50:145, 70:185, 95:225, 120:265, 150:300, 185:345, 240:395, 300:455, 400:530 },
+    conduit: { 0.5:2, 0.75:4, 1:6, 1.5:10, 2.5:14, 4:20, 6:26, 10:35, 16:48, 25:65, 35:80, 50:100, 70:130, 95:160, 120:190, 150:220, 185:250, 240:295, 300:340, 400:395 }
+  },
+  al: {
+    single: { 0.5:2, 0.75:4, 1:7, 1.5:11, 2.5:17, 4:23, 6:30, 10:40, 16:55, 25:70, 35:88, 50:110, 70:140, 95:170, 120:200, 150:230, 185:265, 240:310, 300:355, 400:415 },
+    '2core': { 0.5:2, 0.75:4, 1:6, 1.5:10, 2.5:14, 4:20, 6:25, 10:35, 16:48, 25:62, 35:78, 50:98, 70:125, 95:150, 120:180, 150:205, 185:235, 240:275, 300:315, 400:370 },
+    '3core': { 0.5:2, 0.75:3, 1:6, 1.5:9, 2.5:13, 4:18, 6:23, 10:32, 16:44, 25:58, 35:73, 50:92, 70:117, 95:142, 120:167, 150:192, 185:220, 240:260, 300:300, 400:350 },
+    '4core': { 0.5:2, 0.75:3, 1:5, 1.5:8, 2.5:12, 4:16, 6:21, 10:29, 16:40, 25:53, 35:66, 50:85, 70:108, 95:132, 120:155, 150:178, 185:205, 240:240, 300:275, 400:325 },
+    buried: { 0.5:3, 0.75:6, 1:9, 1.5:14, 2.5:19, 4:25, 6:32, 10:43, 16:58, 25:73, 35:92, 50:112, 70:145, 95:175, 120:205, 150:235, 185:270, 240:310, 300:355, 400:415 },
+    conduit: { 0.5:2, 0.75:3, 1:5, 1.5:7, 2.5:11, 4:15, 6:20, 10:27, 16:37, 25:50, 35:63, 50:78, 70:100, 95:123, 120:147, 150:170, 185:195, 240:230, 300:265, 400:310 }
+  }
+};
+function updateWireAmp() {
+  const size = document.getElementById('wireSize').value;
+  const type = document.getElementById('wireType').value;
+  const mat = document.getElementById('wireMat').value;
+  const amps = wireAmpereData[mat][type][size] || 0;
+  show('wireResult', '📊 Size: ' + size + ' mm²\n🧵 Type: ' + type + '\n🔶 Material: ' + (mat === 'cu' ? 'Copper' : 'Aluminum') + '\n\n⚡ Current: ' + amps + ' A\n🔌 Power @ 230V: ' + (amps * 230 / 1000).toFixed(2) + ' kW\n🔌 Power @ 415V (3Ø): ' + (amps * 415 * 1.732 / 1000).toFixed(2) + ' kW');
+}
+
+// ============ VOLTAGE INFO ============
+const voltData = {
+  '12dc': { name: '12V DC', use: 'Control, PLC I/O, sensors', tol: '±10%' },
+  '24dc': { name: '24V DC', use: 'Industrial control, PLC', tol: '±10%' },
+  '48dc': { name: '48V DC', use: 'Telecom, PoE, solar', tol: '±10%' },
+  '110dc': { name: '110V DC', use: 'Switchgear, protection', tol: '±10%' },
+  '220dc': { name: '220V DC', use: 'Substation control', tol: '±10%' },
+  '230ac': { name: '230V AC', use: 'Single phase domestic', tol: '±6%' },
+  '400ac': { name: '400V AC', use: '3Ø industrial (EU)', tol: '±6%' },
+  '415ac': { name: '415V AC', use: '3Ø industrial (IN/PK)', tol: '±6%' },
+  '440ac': { name: '440V AC', use: 'Heavy industrial, marine', tol: '±6%' },
+  '690ac': { name: '690V AC', use: 'Large motors', tol: '±6%' },
+  '3.3kv': { name: '3.3 kV AC', use: 'Medium voltage motors', tol: '±6%' },
+  '6.6kv': { name: '6.6 kV AC', use: 'MV distribution', tol: '±6%' },
+  '11kv': { name: '11 kV AC', use: 'MV distribution, subs', tol: '±6%' }
+};
+function showVoltInfo() {
+  const v = document.getElementById('voltLevel').value;
+  const d = voltData[v];
+  if (!d) return;
+  show('voltInfo', '⚡ ' + d.name + '\n\n📍 Application: ' + d.use + '\n📏 Tolerance: ' + d.tol + '\n🔒 Safety: ' + (v.includes('kv') ? 'HIGH VOLTAGE' : v.includes('dc') ? 'DC Low' : 'AC Standard'));
+}
+
+// ============ VIBROMETER ============
+let vibRunning = false;
+let vibPeak = 0;
+let vibSum = 0;
+let vibCount = 0;
+let vibLiveData = [];
+let vibHistoryData = [];
+let vibLastBeep = 0;
+let vibSessionStart = null;
+
+function vibStart() {
+  if (!window.DeviceMotionEvent) { show('vibStatus', '❌ Sensor not supported'); return; }
+  if (vibRunning) return;
+  vibSessionStart = new Date();
+  if (typeof DeviceMotionEvent.requestPermission === 'function') {
+    DeviceMotionEvent.requestPermission().then(perm => {
+      if (perm === 'granted') {
+        window.addEventListener('devicemotion', vibHandler);
+        vibRunning = true;
+        show('vibStatus', '✅ Active — ' + vibSessionStart.toLocaleTimeString());
+      } else { show('vibStatus', '❌ Permission denied'); }
+    }).catch(e => show('vibStatus', '❌ ' + e.message));
+  } else {
+    window.addEventListener('devicemotion', vibHandler);
+    vibRunning = true;
+    show('vibStatus', '✅ Active — ' + vibSessionStart.toLocaleTimeString());
+  }
+}
+function vibStop() {
+  window.removeEventListener('devicemotion', vibHandler);
+  vibRunning = false;
+  show('vibStatus', '⏸ Stopped — Total samples: ' + vibCount);
+}
+function vibResetAll() {
+  vibStop();
+  vibPeak = 0; vibSum = 0; vibCount = 0;
+  vibLiveData = []; vibHistoryData = [];
+  show('vibPeak', '0.00'); show('vibAvg', '0.00'); show('vibCount', '0');
+  show('vibMagnitude', '0.00 m/s²'); show('vibX', '0.00'); show('vibY', '0.00'); show('vibZ', '0.00');
+  show('vibAlarm', 'Alarm: OFF'); show('vibStatus', 'Reset done');
+  drawVibGraph(); drawVibHistory();
+}
+function vibHandler(event) {
+  const acc = event.accelerationIncludingGravity;
+  if (!acc) return;
+  const x = (acc.x || 0).toFixed(2);
+  const y = (acc.y || 0).toFixed(2);
+  const z = (acc.z || 0).toFixed(2);
+  const mag = Math.sqrt(x*x + y*y + z*z);
+  const vibration = Math.abs(mag - 9.81);
+  vibSum += vibration; vibCount++;
+  show('vibX', x); show('vibY', y); show('vibZ', z);
+  show('vibMagnitude', vibration.toFixed(2) + ' m/s²');
+  show('vibAvg', (vibSum / vibCount).toFixed(2));
+  show('vibCount', vibCount);
+  if (vibration > vibPeak) { vibPeak = vibration; show('vibPeak', vibPeak.toFixed(2)); }
+  const threshold = parseFloat(document.getElementById('vibThreshold').value) || 15;
+  if (vibration > threshold) {
+    show('vibAlarm', '🔔 ALARM! ' + vibration.toFixed(2) + ' m/s²');
+    if (Date.now() - vibLastBeep > 1000) { playBeep(); vibLastBeep = Date.now(); }
+  } else { show('vibAlarm', '✅ Normal'); }
+  vibLiveData.push(vibration);
+  if (vibLiveData.length > 100) vibLiveData.shift();
+  vibHistoryData.push(vibration);
+  if (vibHistoryData.length > 300) vibHistoryData.shift();
+  drawVibGraph(); drawVibHistory();
+}
+function drawVibGraph() {
+  const canvas = document.getElementById('vibGraph');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  ctx.fillStyle = '#0a0e1a'; ctx.fillRect(0, 0, w, h);
+  ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) { ctx.beginPath(); ctx.moveTo(0, i * h / 4); ctx.lineTo(w, i * h / 4); ctx.stroke(); }
+  if (vibLiveData.length < 2) return;
+  const max = Math.max(...vibLiveData, 10);
+  const threshold = parseFloat(document.getElementById('vibThreshold').value) || 15;
+  if (threshold <= max) {
+    ctx.strokeStyle = '#ef4444'; ctx.setLineDash([5, 5]);
+    ctx.beginPath(); const ty = h - (threshold / max) * h;
+    ctx.moveTo(0, ty); ctx.lineTo(w, ty); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 2;
+  ctx.beginPath();
+  vibLiveData.forEach((v, i) => {
+    const x = (i / 99) * w; const y = h - (v / max) * h;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+  ctx.lineTo(w, h); ctx.lineTo(0, h); ctx.closePath();
+  ctx.fillStyle = 'rgba(56, 189, 248, 0.15)'; ctx.fill();
+}
+function drawVibHistory() {
+  const canvas = document.getElementById('vibHistoryGraph');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  ctx.fillStyle = '#0a0e1a'; ctx.fillRect(0, 0, w, h);
+  if (vibHistoryData.length < 2) return;
+  const max = Math.max(...vibHistoryData, 10);
+  const barW = w / 300;
+  const threshold = parseFloat(document.getElementById('vibThreshold').value) || 15;
+  vibHistoryData.forEach((v, i) => {
+    const barH = (v / max) * h;
+    const x = i * barW;
+    const y = h - barH;
+    if (v > threshold) ctx.fillStyle = '#ef4444';
+    else if (v > threshold * 0.
 </script>
 
 </body>
