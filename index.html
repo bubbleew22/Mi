@@ -1345,7 +1345,6 @@ function pidTick() {
   document.getElementById('pidBar').style.height = pct + '%';
   show('pidLive', 'SP: ' + sp + ' RPM\nPV: ' + pidState.pv.toFixed(0) + ' RPM\nMV: ' + mv.toFixed(1) + ' %\nError: ' + error.toFixed(0));
 }
-
 // ============ BEARING ============
 const bearingDB = {
   '6000':{bore:10,od:26,w:8,type:'Deep Groove'},'6001':{bore:12,od:28,w:8,type:'Deep Groove'},
@@ -1353,7 +1352,7 @@ const bearingDB = {
   '6004':{bore:20,od:42,w:12,type:'Deep Groove'},'6005':{bore:25,od:47,w:12,type:'Deep Groove'},
   '6006':{bore:30,od:55,w:13,type:'Deep Groove'},'6007':{bore:35,od:62,w:14,type:'Deep Groove'},
   '6008':{bore:40,od:68,w:15,type:'Deep Groove'},'6009':{bore:45,od:75,w:16,type:'Deep Groove'},
- '6010':{bore:50,od:80,w:16,type:'Deep Groove'},
+  '6010':{bore:50,od:80,w:16,type:'Deep Groove'},
   '6200':{bore:10,od:30,w:9,type:'Deep Groove'},'6201':{bore:12,od:32,w:10,type:'Deep Groove'},
   '6202':{bore:15,od:35,w:11,type:'Deep Groove'},'6203':{bore:17,od:40,w:12,type:'Deep Groove'},
   '6204':{bore:20,od:47,w:14,type:'Deep Groove'},'6205':{bore:25,od:52,w:15,type:'Deep Groove'},
@@ -1397,7 +1396,6 @@ function lookupBearing() {
     show('bearingResult', '❌ Not found. Try: 6205, 6305, 22210, 30205');
   }
 }
-
 // BUSBAR
 function updateBusbar() {
   const type = document.getElementById('busType').value;
